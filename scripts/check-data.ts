@@ -40,13 +40,18 @@ for (const level of index?.levels ?? []) {
 }
 
 // data/overrides
-const tr = readJson<Record<string, unknown>>(join(OVERRIDES_DIR, 'tr.json')) ?? {}
-for (const [id, value] of Object.entries(tr)) {
-  if (id.startsWith('$')) continue
-  if (!ids.has(id)) fail(`overrides/tr.json: bilinmeyen kelime kimliği "${id}"`)
-  if (!isStrArray(value) || value.length === 0 || value.length > 4)
-    fail(`overrides/tr.json: "${id}" 1–4 elemanlı bir metin listesi olmalı`)
+function checkTrFile(file: string): Record<string, unknown> {
+  const data = readJson<Record<string, unknown>>(join(OVERRIDES_DIR, file)) ?? {}
+  for (const [id, value] of Object.entries(data)) {
+    if (id.startsWith('$')) continue
+    if (!ids.has(id)) fail(`overrides/${file}: bilinmeyen kelime kimliği "${id}"`)
+    if (!isStrArray(value) || value.length === 0 || value.length > 4)
+      fail(`overrides/${file}: "${id}" 1–4 elemanlı bir metin listesi olmalı`)
+  }
+  return data
 }
+const tr = checkTrFile('tr.json')
+checkTrFile('tr-auto.json')
 
 const examples = readJson<Record<string, unknown>>(join(OVERRIDES_DIR, 'examples.json')) ?? {}
 for (const [id, value] of Object.entries(examples)) {

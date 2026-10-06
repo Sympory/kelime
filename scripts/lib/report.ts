@@ -4,7 +4,8 @@ import type { Cefr, Word } from '../../src/types/word.ts'
 import { ROOT } from './paths.ts'
 
 const FIELDS = {
-  tr: (w: Word) => w.tr.length > 0,
+  tr: (w: Word) => w.tr.length > 0 && !w.trAuto,
+  trAny: (w: Word) => w.tr.length > 0,
   defEn: (w: Word) => w.defEn.length > 0,
   ipa: (w: Word) => Boolean(w.ipa),
   examples: (w: Word) => w.examples.length > 0,
@@ -15,7 +16,8 @@ const FIELDS = {
 } as const
 
 const LABELS: Record<keyof typeof FIELDS, string> = {
-  tr: 'Türkçe',
+  tr: 'Türkçe (kaynaklı)',
+  trAny: 'Türkçe (otomatik dahil)',
   defEn: 'Tanım',
   ipa: 'IPA',
   examples: 'Örnek',
@@ -43,18 +45,21 @@ export function report(byLevel: Map<Cefr, Word[]>): void {
   console.table(rows)
 
   const header = ['Seviye', 'Kelime', ...keys.map((k) => LABELS[k])]
-  const missingTr = [...byLevel].flatMap(([level, words]) => {
-    const missing = words.filter((w) => !FIELDS.tr(w))
-    if (missing.length === 0) return []
-    return [
-      `<details><summary><strong>${level}</strong> — ${missing.length} kelime</summary>`,
-      '',
-      missing.map((w) => `\`${w.id}\``).join(' · '),
-      '',
-      '</details>',
-      '',
-    ]
-  })
+  const listByLevel = (pick: (w: Word) => boolean) =>
+    [...byLevel].flatMap(([level, words]) => {
+      const picked = words.filter(pick)
+      if (picked.length === 0) return []
+      return [
+        `<details><summary><strong>${level}</strong> — ${picked.length} kelime</summary>`,
+        '',
+        picked.map((w) => `\`${w.id}\``).join(' · '),
+        '',
+        '</details>',
+        '',
+      ]
+    })
+  const missingTr = listByLevel((w) => !FIELDS.trAny(w))
+  const autoTr = listByLevel((w) => Boolean(w.trAuto))
 
   const md = [
     '# Veri raporu',
@@ -71,9 +76,16 @@ export function report(byLevel: Map<Cefr, Word[]>): void {
     '',
     '## Türkçe karşılığı eksik kelimeler',
     '',
-    'Katkı vermek için [`data/overrides/tr.json`](overrides/tr.json) dosyasına ekleyin (bkz. [README](overrides/README.md)).',
+    missingTr.length
+      ? 'Katkı vermek için [`data/overrides/tr.json`](overrides/tr.json) dosyasına ekleyin (bkz. [README](overrides/README.md)).'
+      : 'Yok — her kelimenin bir Türkçe karşılığı var.',
     '',
     ...missingTr,
+    '## Gözden geçirilmeyi bekleyen otomatik çeviriler',
+    '',
+    'Bu kelimelerin Türkçesi Vikisözlük’te bulunmadığı için yapay zekâ ile üretildi ([`tr-auto.json`](overrides/tr-auto.json)); uygulamada “otomatik” etiketiyle görünür. Yanlış ya da eksik bulduğunuzu [`tr.json`](overrides/tr.json) ile düzeltin — düzeltme otomatik çevirinin yerine geçer ve etiket kalkar.',
+    '',
+    ...autoTr,
   ].join('\n')
   writeFileSync(join(ROOT, 'data', 'report.md'), md)
   console.log('Rapor: data/report.md')
