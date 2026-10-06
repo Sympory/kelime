@@ -4,5 +4,6 @@ package-lock.json
 public/data
 data/raw
 scripts/.cache
+data/report.md
 tmp-scaffold
 PLAN.md

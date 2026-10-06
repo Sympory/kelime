@@ -13,7 +13,7 @@ B1 → B2+/C1 hedefi için günlük ~15 dakikalık kelime çalışması yapılan
 ## Temel kısıtlar
 
 - **Maliyet sıfır:** Backend, veritabanı, ücretli API yok.
-- **Yayın:** Vercel (Hobby, ücretsiz) — GitHub reposu Vercel'e bağlı. `main`'e giren her değişiklik production'a çıkar, her PR otomatik bir **önizleme adresi** alır (arkadaşlar değişikliği merge'den önce canlı deneyebilir). Site kökten yayınlanır, Vite `base` ayarı `/` (varsayılan). Vercel yapılandırması `vercel.json`'da.
+- **Yayın:** Vercel (Hobby, ücretsiz) → https://kelime-pink.vercel.app/ — GitHub reposu Vercel'e bağlı. `main`'e giren her değişiklik production'a çıkar, her PR otomatik bir **önizleme adresi** alır (arkadaşlar değişikliği merge'den önce canlı deneyebilir). Site kökten yayınlanır, Vite `base` ayarı `/` (varsayılan). Vercel yapılandırması `vercel.json`'da.
   - Not: Vercel Hobby planı kişisel/ticari olmayan kullanım içindir; proje öyle kaldığı sürece ücretsiz.
 - **Açık kaynak:** Public repo `Sympory/kelime`, MIT lisans (kod). Veri dosyaları kendi lisanslarını taşır (aşağıda).
 - **Kullanıcı ilerlemesi tarayıcıda tutulur** (IndexedDB). Hesap/giriş yok. Dışa/içe aktarma (JSON) ile cihazlar arası taşınır.
