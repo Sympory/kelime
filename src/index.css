@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* CEFR seviye renkleri: A1 yeşil → C2 mor */
+  --color-cefr-a1: #22c55e;
+  --color-cefr-a2: #84cc16;
+  --color-cefr-b1: #eab308;
+  --color-cefr-b2: #f97316;
+  --color-cefr-c1: #a855f7;
+  --color-cefr-c2: #7c3aed;
+}
+
+/* Koyu tema öncelikli; açık tema sistem tercihiyle */
+:root {
+  color-scheme: dark light;
+}
+
+body {
+  @apply min-h-dvh bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+}

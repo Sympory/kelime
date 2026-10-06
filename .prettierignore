@@ -1,0 +1,8 @@
+dist
+node_modules
+package-lock.json
+public/data
+data/raw
+scripts/.cache
+tmp-scaffold
+PLAN.md
