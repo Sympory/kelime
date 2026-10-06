@@ -27,6 +27,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
+      - run: npm run check:data
       - run: npm run build
       - if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
