@@ -132,14 +132,16 @@ kelime/
 - ESLint + Prettier, basit README.
 - _Not: İlk olarak GitHub Pages'e yayınlandı, ardından Vercel'e taşındı._
 
-**Faz 1 — Veri hattı**
+**Faz 1 — Veri hattı** ✅
 - `scripts/` altında: listeleri indir → birleştir/tekilleştir → zenginleştir (Wiktionary, Tatoeba, WordNet, Datamuse) → `overrides` uygula → `public/data/*.json` üret.
 - `npm run build:data` komutu. Rapor çıktısı: kaç kelime, kaçında Türkçe/örnek/collocation eksik.
+- _Sonuç: 9.723 kelime (A1–C2); Türkçe %72, örnek %97, collocation %96. Ek kaynak olarak Türkçe Vikisözlük kullanıldı. Ayrıntı: `data/report.md`._
 
-**Faz 2 — Tekrar sistemi ve çalışma ekranı**
+**Faz 2 — Tekrar sistemi ve çalışma ekranı** ✅
 - Dexie şeması, ts-fsrs entegrasyonu, günlük kuyruk, çalışma ekranı, klavye kısayolları.
 - Yerleştirme (eleme) ekranı.
 - Algoritma için birim testleri (Vitest).
+- _Kararlar:_ gün 04:00'te döner; öğrenme adımları 1 dk / 10 dk, yeniden öğrenme 10 dk; 20 dk içinde vadesi gelecek öğrenme kartları oturumda kalır; yeni kelimeler kimliğe göre kararlı karışık sırayla gelir (veri alfabetik); kart ön yüzünde her tekrarda farklı örnek cümle; telefonda kartı sağa kaydır = İyi, sola = Tekrar.
 
 **Faz 3 — Gezgin, detay ve ana sayfa**
 - Kelime gezgini, detay sayfası, ana sayfa ilerleme göstergeleri, telaffuz.
