@@ -2,7 +2,7 @@
 
 Açık kaynak, tamamen ücretsiz İngilizce kelime kartı uygulaması. B1 → B2+/C1 hedefi için günde ~15 dakikalık aralıklı tekrar (spaced repetition) çalışması.
 
-**Canlı:** https://sympory.github.io/kelime/
+**Canlı:** https://kelime-pink.vercel.app/
 
 ## Özellikler (planlanan)
 
@@ -19,13 +19,13 @@ Gereksinim: Node.js 22.18+ (veri betikleri TypeScript'i doğrudan Node ile çal�
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/kelime/
+npm run dev        # http://localhost:5173/
 npm run build      # tip kontrolü + üretim derlemesi (dist/)
 npm run lint       # ESLint
 npm run format     # Prettier ile biçimlendir
 ```
 
-`main` korumalıdır: değişiklikler dal + PR ile gelir, CI (lint, format, build) geçmeden birleştirilemez. `main`'e giren her değişiklik GitHub Pages'e otomatik yayınlanır.
+Yayın **Vercel** üzerinden yapılır: `main`'e giren her değişiklik production'a çıkar, her PR otomatik bir önizleme adresi alır. GitHub Actions (`ci.yml`) yalnızca kontrol çalıştırır (lint, format, veri doğrulama, build); `main` korumalıdır ve bu kontroller geçmeden merge edilemez.
 
 ## Kelime verisi
 

@@ -13,7 +13,8 @@ B1 → B2+/C1 hedefi için günlük ~15 dakikalık kelime çalışması yapılan
 ## Temel kısıtlar
 
 - **Maliyet sıfır:** Backend, veritabanı, ücretli API yok.
-- **Yayın:** GitHub Pages → `https://sympory.github.io/kelime/` (okçuluk sitesiyle aynı yapı). Vite `base` ayarı `/kelime/` olmalı.
+- **Yayın:** Vercel (Hobby, ücretsiz) → https://kelime-pink.vercel.app/ — GitHub reposu Vercel'e bağlı. `main`'e giren her değişiklik production'a çıkar, her PR otomatik bir **önizleme adresi** alır (arkadaşlar değişikliği merge'den önce canlı deneyebilir). Site kökten yayınlanır, Vite `base` ayarı `/` (varsayılan). Vercel yapılandırması `vercel.json`'da.
+  - Not: Vercel Hobby planı kişisel/ticari olmayan kullanım içindir; proje öyle kaldığı sürece ücretsiz.
 - **Açık kaynak:** Public repo `Sympory/kelime`, MIT lisans (kod). Veri dosyaları kendi lisanslarını taşır (aşağıda).
 - **Kullanıcı ilerlemesi tarayıcıda tutulur** (IndexedDB). Hesap/giriş yok. Dışa/içe aktarma (JSON) ile cihazlar arası taşınır.
 
@@ -21,13 +22,14 @@ B1 → B2+/C1 hedefi için günlük ~15 dakikalık kelime çalışması yapılan
 
 | Katman | Seçim | Neden |
 |---|---|---|
-| Build | Vite + React + TypeScript | Hızlı, statik çıktı, Pages'e uygun |
+| Build | Vite + React + TypeScript | Hızlı, statik çıktı, Vercel'e uygun |
 | Stil | Tailwind CSS + Framer Motion | Hızlı güzel arayüz, kart çevirme animasyonu |
 | Yerel veri | Dexie.js (IndexedDB) | Kart durumları, kullanıcı kartları, ayarlar |
 | Tekrar algoritması | `ts-fsrs` (MIT) | Modern FSRS algoritması; SM-2'den daha isabetli aralıklar |
 | Offline/telefon | `vite-plugin-pwa` | Ana ekrana eklenebilir, internetsiz çalışır |
-| Router | React Router (HashRouter) | GitHub Pages'te 404 sorunu olmasın |
-| Deploy | GitHub Actions → Pages | `main`'e push = otomatik yayın |
+| Router | React Router (BrowserRouter) | Temiz adresler (`/kaynaklar`); `vercel.json`'daki SPA yönlendirmesi sayesinde yenilemede 404 olmaz |
+| Deploy | Vercel GitHub entegrasyonu | `main` → production, her PR → önizleme adresi |
+| CI | GitHub Actions (`ci.yml`) | lint + format + veri doğrulama + build; geçmeden merge yok |
 | Veri hazırlama | Node/TS script'leri (`scripts/`) | Veri build sırasında bir kez üretilip statik JSON olarak repoya girer |
 
 ## Kelime verisi — kaynaklar ve lisans
@@ -116,16 +118,19 @@ kelime/
 │  ├─ srs/             # ts-fsrs sarmalayıcı, kuyruk mantığı
 │  ├─ features/        # study, browse, add, stats, settings
 │  └─ components/
-├─ .github/workflows/deploy.yml
+├─ .github/workflows/ci.yml   # yalnızca kontrol; yayın Vercel'de
+├─ vercel.json                # SPA yönlendirmesi, önbellek başlıkları
 ├─ PLAN.md · README.md · CONTRIBUTING.md · DATA_LICENSES.md · LICENSE
 ```
 
 ## Fazlar
 
-**Faz 0 — İskelet ve yayın**
-- Vite + React + TS + Tailwind kurulumu, HashRouter, `base: '/kelime/'`.
-- GitHub Actions ile Pages'e otomatik deploy. "Merhaba" sayfası canlıda görünsün.
+**Faz 0 — İskelet ve yayın** ✅
+- Vite + React + TS + Tailwind kurulumu, BrowserRouter, `base: '/'`.
+- Vercel'e otomatik deploy (GitHub entegrasyonu), PR önizlemeleri. "Merhaba" sayfası canlıda görünsün.
+- GitHub Actions ile CI; `main` dal koruması.
 - ESLint + Prettier, basit README.
+- _Not: İlk olarak GitHub Pages'e yayınlandı, ardından Vercel'e taşındı._
 
 **Faz 1 — Veri hattı**
 - `scripts/` altında: listeleri indir → birleştir/tekilleştir → zenginleştir (Wiktionary, Tatoeba, WordNet, Datamuse) → `overrides` uygula → `public/data/*.json` üret.
@@ -149,6 +154,7 @@ kelime/
 ## Arkadaşlarla çalışma
 
 - `main` korumalı; herkes branch açıp PR gönderir, Actions build + test geçmeden merge yok.
+- Her PR'a Vercel bir önizleme adresi yorum olarak ekler; gözden geçiren değişikliği tarayıcıda deneyip onaylar.
 - Katkının en kolay yolu `data/overrides/` dosyalarındaki Türkçe karşılık ve örnek düzeltmeleri; kod bilmeyen arkadaşlar da katkı verebilir.
 - İlerleme verisi kişiye özel ve tarayıcıda olduğu için herkes aynı siteyi kendi ilerlemesiyle kullanır.
 
@@ -156,3 +162,12 @@ kelime/
 
 - Hesap sistemi, sunucu tarafı senkronizasyon, ücretli API'ler.
 - İleride istenirse: GitHub Gist ile ücretsiz senkronizasyon, arkadaşlar arası liderlik tablosu.
+
+### İleride: sosyal özellikler (Faz 5 sonrası fikir, şimdilik kapsam dışı)
+
+Vercel'e geçiş bunun önünü açıyor ama mevcut fazlar bitmeden başlanmayacak.
+
+- **Online arkadaşlık:** arkadaş ekleme, birbirinin serisini (streak) ve haftalık ilerlemesini görme.
+- **Challenge:** arkadaşlar arası haftalık kelime yarışı, aynı kelime setiyle düello.
+- **Gerekecekler:** hesap/giriş (ör. GitHub ile giriş), sunucu tarafı küçük bir veritabanı ve API (Vercel Functions + ücretsiz katmanlı bir veritabanı). Bu, "backend yok" ve "hesap yok" kısıtlarını değiştirir; o zaman ayrı bir planla ele alınmalı.
+- Tasarım ilkesi: sosyal özellikler **isteğe bağlı** kalmalı; hesap açmayan kullanıcı uygulamayı bugünkü gibi tamamen yerel kullanabilmeli.

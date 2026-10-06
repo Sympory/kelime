@@ -1,0 +1,28 @@
+# Yalnızca kontrol: yayın Vercel'in GitHub entegrasyonuyla yapılır
+# (main → production, her PR → önizleme adresi).
+# Job adı "build", main dal korumasındaki zorunlu kontroldür; değiştirirseniz korumayı da güncelleyin.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run check:data
+      - run: npm run build
