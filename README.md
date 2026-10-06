@@ -2,7 +2,7 @@
 
 Açık kaynak, tamamen ücretsiz İngilizce kelime kartı uygulaması. B1 → B2+/C1 hedefi için günde ~15 dakikalık aralıklı tekrar (spaced repetition) çalışması.
 
-**Canlı:** https://sympory.github.io/kelime/
+**Canlı:** Vercel'de yayınlanır (adres ilk yayından sonra buraya eklenecek).
 
 ## Özellikler (planlanan)
 
@@ -19,13 +19,13 @@ Gereksinim: Node.js 22+
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/kelime/
+npm run dev        # http://localhost:5173/
 npm run build      # tip kontrolü + üretim derlemesi (dist/)
 npm run lint       # ESLint
 npm run format     # Prettier ile biçimlendir
 ```
 
-`main` dalına yapılan her push GitHub Actions ile GitHub Pages'e otomatik yayınlanır.
+Yayın **Vercel** üzerinden yapılır: `main`'e giren her değişiklik production'a çıkar, her PR otomatik bir önizleme adresi alır. GitHub Actions (`ci.yml`) yalnızca kontrol çalıştırır (lint, format, build); `main` korumalıdır ve bu kontroller geçmeden merge edilemez.
 
 ## Lisans
 
