@@ -1,10 +1,10 @@
-import { HashRouter, Link, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import Home from './features/home/Home'
 import Sources from './features/sources/Sources'
 
 export default function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <div className="mx-auto flex min-h-dvh max-w-2xl flex-col px-4">
         <header className="flex items-center justify-between py-5">
           <Link to="/" className="font-display text-2xl font-bold tracking-tight">
@@ -24,6 +24,6 @@ export default function App() {
           </Routes>
         </main>
       </div>
-    </HashRouter>
+    </BrowserRouter>
   )
 }
