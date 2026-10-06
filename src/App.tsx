@@ -1,6 +1,16 @@
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import { BrowserRouter, Link, NavLink, Route, Routes } from 'react-router-dom'
+import { Loading } from './components/Loading'
 import Home from './features/home/Home'
-import Sources from './features/sources/Sources'
+
+// Animasyon kütüphanesini kullanan ekranlar ayrı parçalarda: ana sayfa hızlı açılsın
+const Onboarding = lazy(() => import('./features/onboarding/Onboarding'))
+const Placement = lazy(() => import('./features/placement/Placement'))
+const Sources = lazy(() => import('./features/sources/Sources'))
+const Study = lazy(() => import('./features/study/Study'))
+
+const navClass = ({ isActive }: { isActive: boolean }) =>
+  isActive ? 'text-zinc-900 dark:text-zinc-100' : 'hover:text-zinc-900 dark:hover:text-zinc-100'
 
 export default function App() {
   return (
@@ -10,18 +20,26 @@ export default function App() {
           <Link to="/" className="font-display text-2xl font-bold tracking-tight">
             Kelime
           </Link>
-          <nav className="text-sm text-zinc-500 dark:text-zinc-400">
-            <Link to="/kaynaklar" className="hover:text-zinc-900 dark:hover:text-zinc-100">
+          <nav className="flex gap-4 text-sm text-zinc-500 dark:text-zinc-400">
+            <NavLink to="/calis" className={navClass}>
+              Çalış
+            </NavLink>
+            <NavLink to="/kaynaklar" className={navClass}>
               Kaynaklar
-            </Link>
+            </NavLink>
           </nav>
         </header>
         <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/kaynaklar" element={<Sources />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
+          <Suspense fallback={<Loading />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/baslangic" element={<Onboarding />} />
+              <Route path="/eleme" element={<Placement />} />
+              <Route path="/calis" element={<Study />} />
+              <Route path="/kaynaklar" element={<Sources />} />
+              <Route path="*" element={<Home />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </BrowserRouter>
