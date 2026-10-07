@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { CefrBadge } from '../../components/CefrBadge'
 import { Loading } from '../../components/Loading'
 import { POS_LABELS } from '../../components/pos'
+import { SpeakButton } from '../../components/SpeakButton'
 import { db } from '../../db/db'
 import { useSettings } from '../../db/hooks'
 import { placeWord, saveSettings } from '../../db/repo'
@@ -194,9 +195,10 @@ function SwipeCard({
       <p className="font-display mt-6 text-5xl font-bold tracking-tight break-words">
         {word.lemma}
       </p>
-      <p className="mt-2 text-sm text-zinc-500">
+      <p className="mt-2 flex items-center justify-center gap-1 text-sm text-zinc-500">
         {POS_LABELS[word.pos]}
-        {word.ipa && <span className="ml-2 font-mono">{word.ipa}</span>}
+        {word.ipa && <span className="ml-1 font-mono">{word.ipa}</span>}
+        <SpeakButton text={word.lemma} label="Telaffuz" />
       </p>
       <p className="mt-6 min-h-12 text-lg text-zinc-600 dark:text-zinc-300">
         {showMeaning ? (

@@ -3,11 +3,13 @@ import { BrowserRouter, Link, NavLink, Route, Routes } from 'react-router-dom'
 import { Loading } from './components/Loading'
 import Home from './features/home/Home'
 
-// Animasyon kütüphanesini kullanan ekranlar ayrı parçalarda: ana sayfa hızlı açılsın
+// Ana sayfa dışındaki ekranlar ayrı parçalarda: ilk açılış hızlı olsun
+const Browse = lazy(() => import('./features/browse/Browse'))
 const Onboarding = lazy(() => import('./features/onboarding/Onboarding'))
 const Placement = lazy(() => import('./features/placement/Placement'))
 const Sources = lazy(() => import('./features/sources/Sources'))
 const Study = lazy(() => import('./features/study/Study'))
+const WordPage = lazy(() => import('./features/word/WordPage'))
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
   isActive ? 'text-zinc-900 dark:text-zinc-100' : 'hover:text-zinc-900 dark:hover:text-zinc-100'
@@ -24,6 +26,9 @@ export default function App() {
             <NavLink to="/calis" className={navClass}>
               Çalış
             </NavLink>
+            <NavLink to="/kelimeler" className={navClass}>
+              Kelimeler
+            </NavLink>
             <NavLink to="/kaynaklar" className={navClass}>
               Kaynaklar
             </NavLink>
@@ -36,6 +41,8 @@ export default function App() {
               <Route path="/baslangic" element={<Onboarding />} />
               <Route path="/eleme" element={<Placement />} />
               <Route path="/calis" element={<Study />} />
+              <Route path="/kelimeler" element={<Browse />} />
+              <Route path="/kelime/:id" element={<WordPage />} />
               <Route path="/kaynaklar" element={<Sources />} />
               <Route path="*" element={<Home />} />
             </Routes>

@@ -21,12 +21,18 @@ afterEach(async () => {
 describe('repo', () => {
   it('ayarlar: varsayılanlar + kaydedilenler', async () => {
     const db = freshDb()
-    expect(await getSettings(db)).toEqual({ levels: [], dailyNewLimit: 10, placementDone: false })
+    expect(await getSettings(db)).toEqual({
+      levels: [],
+      dailyNewLimit: 10,
+      placementDone: false,
+      accent: 'en-US',
+    })
     await saveSettings(db, { levels: ['B1', 'B2'], dailyNewLimit: 15 })
     expect(await getSettings(db)).toEqual({
       levels: ['B1', 'B2'],
       dailyNewLimit: 15,
       placementDone: false,
+      accent: 'en-US',
     })
   })
 
