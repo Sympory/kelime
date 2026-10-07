@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { Cefr, DataIndex, Word } from '../types/word'
+import type { Cefr, DataIndex, DataLookup, Word } from '../types/word'
 
 export const LEVELS: Cefr[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 
@@ -78,4 +78,28 @@ export function levelsFrom(start: Cefr): Cefr[] {
   return start === 'C1' || start === 'C2'
     ? LEVELS.slice(i)
     : LEVELS.slice(i, LEVELS.indexOf('C1') + 1)
+}
+
+let lookupPromise: Promise<DataLookup> | undefined
+
+/** Yazılış → kelime sözlüğü (`public/data/lookup.json`, gzip ~140 KB); yalnızca gerekince indirilir. */
+export function loadLookup(): Promise<DataLookup> {
+  lookupPromise ??= fetch('/data/lookup.json').then((r) => {
+    if (!r.ok) throw new Error(`Sözlük yüklenemedi (${r.status})`)
+    return r.json() as Promise<DataLookup>
+  })
+  return lookupPromise
+}
+
+/** "Declined" → [decline-v (B2)]; "saw" → [saw-n, saw-v, see-v]. Bulunamazsa boş liste. */
+export async function lookupWords(text: string): Promise<Word[]> {
+  const key = text.toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim()
+  const hits = (await loadLookup())[key] ?? []
+  const words = await Promise.all(
+    hits.map(async (hit) => {
+      const [id, cefr] = hit.split('|') as [string, Cefr]
+      return (await loadLevel(cefr)).find((w) => w.id === id)
+    }),
+  )
+  return words.filter((w): w is Word => Boolean(w))
 }

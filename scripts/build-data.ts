@@ -7,7 +7,7 @@
  */
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { Cefr, DataIndex, Example, Word } from '../src/types/word.ts'
+import type { Cefr, DataIndex, DataLookup, Example, Word } from '../src/types/word.ts'
 import { fetchCollocations } from './lib/datamuse.ts'
 import { loadOverrides } from './lib/overrides.ts'
 import { OUT_DIR } from './lib/paths.ts'
@@ -124,7 +124,7 @@ for (const id of [
 
 const byLevel = new Map<Cefr, Word[]>(LEVELS.map((l) => [l, []]))
 words.sort((a, b) => a.lemma.localeCompare(b.lemma, 'en') || a.id.localeCompare(b.id))
-for (const w of words) byLevel.get(w.cefr)!.push(w)
+for (const w of words) byLevel.get(w.cefr!)!.push(w) // hazır veride seviye her zaman dolu
 
 const index: DataIndex = { generatedAt: new Date().toISOString(), levels: [] }
 for (const [level, list] of byLevel) {
@@ -134,6 +134,17 @@ for (const [level, list] of byLevel) {
   index.levels.push({ cefr: level, file, count: list.length })
 }
 writeFileSync(join(OUT_DIR, 'index.json'), JSON.stringify(index, null, 2) + '\n')
+
+// Yazılış → kelime sözlüğü ("declined" → decline-v): makaleden ekleme ve CSV içe aktarmada
+// kelimeyi bulmak için. Belirsiz yazılışlar birden çok adaya gider ("saw" → saw-n, see-v).
+const lookup: DataLookup = {}
+for (const w of words) {
+  for (const form of allForms.get(w.id) ?? [w.lemma.toLowerCase()]) {
+    ;(lookup[form] ??= []).push(`${w.id}|${w.cefr}`)
+  }
+}
+writeFileSync(join(OUT_DIR, 'lookup.json'), JSON.stringify(lookup) + '\n')
+console.log(`Sözlük: ${Object.keys(lookup).length} yazılış`)
 
 report(byLevel)
 console.timeEnd('build:data')

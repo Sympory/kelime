@@ -1,9 +1,19 @@
 import type { StoredCard } from '../srs/queue'
-import { DEFAULT_SETTINGS, type KelimeDB, type ReviewRecord, type Settings } from './db'
+import type { Word } from '../types/word'
+import {
+  DEFAULT_SETTINGS,
+  type KelimeDB,
+  type ReviewRecord,
+  type Settings,
+  type UserExample,
+} from './db'
 import { getSettings } from './repo'
 
-/** Yedek dosyası biçimi. Alan eklenirse sürümü artırıp `importBackup` içinde eski sürümü dönüştürün. */
-export const BACKUP_VERSION = 1
+/**
+ * Yedek dosyası biçimi. Alan eklenirse sürümü artırıp `importBackup` içinde eski sürümü dönüştürün.
+ * 1: ayarlar, kartlar, tekrarlar · 2: + kullanıcı kelimeleri ve örnek cümleleri
+ */
+export const BACKUP_VERSION = 2
 
 export type Backup = {
   app: 'kelime'
@@ -12,13 +22,17 @@ export type Backup = {
   settings: Settings
   cards: StoredCard[]
   reviews: ReviewRecord[]
+  userWords: Word[]
+  userExamples: UserExample[]
 }
 
 export async function exportBackup(db: KelimeDB, now = new Date()): Promise<Backup> {
-  const [settings, cards, reviews] = await Promise.all([
+  const [settings, cards, reviews, userWords, userExamples] = await Promise.all([
     getSettings(db),
     db.cards.toArray(),
     db.reviews.toArray(),
+    db.userWords.toArray(),
+    db.userExamples.toArray(),
   ])
   return {
     app: 'kelime',
@@ -27,6 +41,8 @@ export async function exportBackup(db: KelimeDB, now = new Date()): Promise<Back
     settings,
     cards,
     reviews,
+    userWords,
+    userExamples,
   }
 }
 
@@ -58,23 +74,48 @@ export async function importBackup(
   const cards = b.cards.map((c) => revive(c, CARD_DATES))
   const reviews = b.reviews.map((r) => revive(r, REVIEW_DATES))
   const settings = { ...DEFAULT_SETTINGS, ...b.settings }
+  // Sürüm 1 yedeklerinde kullanıcı kelimeleri yok
+  const userWords = Array.isArray(b.userWords) ? b.userWords : []
+  const userExamples = (Array.isArray(b.userExamples) ? b.userExamples : []).map((e) =>
+    revive(e, ['addedAt']),
+  )
 
-  await db.transaction('rw', db.cards, db.reviews, db.settings, async () => {
-    await Promise.all([db.cards.clear(), db.reviews.clear(), db.settings.clear()])
-    await db.cards.bulkPut(cards)
-    await db.reviews.bulkPut(reviews)
-    await db.settings.bulkPut(
-      Object.entries(settings).map(([key, value]) => ({ key: key as keyof Settings, value })),
-    )
-  })
+  await db.transaction(
+    'rw',
+    [db.cards, db.reviews, db.settings, db.userWords, db.userExamples],
+    async () => {
+      await clearAll(db)
+      await db.cards.bulkPut(cards)
+      await db.reviews.bulkPut(reviews)
+      await db.userWords.bulkPut(userWords)
+      await db.userExamples.bulkPut(userExamples)
+      await db.settings.bulkPut(
+        Object.entries(settings).map(([key, value]) => ({ key: key as keyof Settings, value })),
+      )
+    },
+  )
   return { cards: cards.length, reviews: reviews.length }
 }
 
 /** Tüm ilerlemeyi siler (ayarlar dahil). */
 export async function resetAll(db: KelimeDB): Promise<void> {
-  await db.transaction('rw', db.cards, db.reviews, db.settings, async () => {
-    await Promise.all([db.cards.clear(), db.reviews.clear(), db.settings.clear()])
-  })
+  await db.transaction(
+    'rw',
+    [db.cards, db.reviews, db.settings, db.userWords, db.userExamples],
+    async () => {
+      await clearAll(db)
+    },
+  )
+}
+
+function clearAll(db: KelimeDB) {
+  return Promise.all([
+    db.cards.clear(),
+    db.reviews.clear(),
+    db.settings.clear(),
+    db.userWords.clear(),
+    db.userExamples.clear(),
+  ])
 }
 
 /** Tarayıcıda dosya indirtir. */

@@ -24,14 +24,19 @@ export async function countIntroducedToday(db: KelimeDB, now: Date): Promise<num
     .count()
 }
 
-function stored(wordId: string, cefr: Cefr, status: StoredCard['status'], now: Date): StoredCard {
+function stored(
+  wordId: string,
+  cefr: Cefr | undefined,
+  status: StoredCard['status'],
+  now: Date,
+): StoredCard {
   return { ...newCard(now), wordId, cefr, status, addedAt: now }
 }
 
 /** Yerleştirme: "biliyorum" → çalışılmaz; "bilmiyorum" → yeni kart olarak sıranın başına. */
 export async function placeWord(
   db: KelimeDB,
-  word: { id: string; cefr: Cefr },
+  word: { id: string; cefr?: Cefr },
   known: boolean,
   now: Date,
 ): Promise<void> {
@@ -41,7 +46,7 @@ export async function placeWord(
 /** Kartı değerlendirir, kaydı günceller ve tekrar günlüğüne ekler. Güncel kartı döner. */
 export async function rateWord(
   db: KelimeDB,
-  word: { id: string; cefr: Cefr },
+  word: { id: string; cefr?: Cefr },
   grade: Grade,
   now: Date,
 ): Promise<StoredCard> {
@@ -58,7 +63,7 @@ export async function rateWord(
 /** Değerlendirilmemiş bir kelime için geçici kart (buton etiketlerindeki aralık önizlemesi için). */
 export function previewCard(
   existing: StoredCard | undefined,
-  word: { id: string; cefr: Cefr },
+  word: { id: string; cefr?: Cefr },
   now: Date,
 ): StoredCard {
   return existing ?? stored(word.id, word.cefr, 'active', now)

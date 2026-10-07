@@ -26,7 +26,7 @@ export default function Home() {
     const poolSize = index.levels
       .filter((l) => s.levels.includes(l.cefr))
       .reduce((sum, l) => sum + l.count, 0)
-    const seenInPool = cards.filter((c) => s.levels.includes(c.cefr)).length
+    const seenInPool = cards.filter((c) => c.cefr && s.levels.includes(c.cefr)).length
     const queuedNew = active.filter((c) => c.state === State.New).length
     const newAvailable = Math.min(
       Math.max(0, s.dailyNewLimit - introduced),
@@ -99,6 +99,9 @@ export default function Home() {
       <div className="mt-8 flex flex-wrap gap-4 text-sm font-medium">
         <Link to="/eleme" className="underline underline-offset-4">
           Hızlı eleme
+        </Link>
+        <Link to="/ekle" className="underline underline-offset-4">
+          Makaleden ekle
         </Link>
         <Link to="/kelimeler" className="underline underline-offset-4">
           Kelimelere göz at

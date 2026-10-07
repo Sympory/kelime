@@ -9,12 +9,14 @@ const COLORS: Record<Cefr, string> = {
   C2: 'bg-cefr-c2',
 }
 
-export function CefrBadge({ level, className = '' }: { level: Cefr; className?: string }) {
+/** CEFR rozeti; seviyesi bilinmeyen (kullanıcının eklediği) kelimelerde "Kendi" yazar. */
+export function CefrBadge({ level, className = '' }: { level?: Cefr; className?: string }) {
   return (
     <span
-      className={`${COLORS[level]} inline-block rounded-full px-2.5 py-0.5 text-xs font-bold tracking-wide text-zinc-950 ${className}`}
+      className={`${level ? COLORS[level] : 'bg-zinc-300 dark:bg-zinc-600'} inline-block rounded-full px-2.5 py-0.5 text-xs font-bold tracking-wide text-zinc-950 ${className}`}
+      title={level ? undefined : 'Kendi eklediğin kelime'}
     >
-      {level}
+      {level ?? 'Kendi'}
     </span>
   )
 }

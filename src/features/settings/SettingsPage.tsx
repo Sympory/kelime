@@ -8,6 +8,7 @@ import { useSettings } from '../../db/hooks'
 import { saveSettings } from '../../db/repo'
 import { speak, speechSupported } from '../../lib/speech'
 import { dayKey } from '../../srs/day'
+import { importWordList, parseWordList, type ImportSummary } from './wordList'
 
 export default function SettingsPage() {
   const settings = useSettings()
@@ -155,6 +156,7 @@ function SettingsForm({ settings }: { settings: Settings }) {
             {message.text}
           </p>
         )}
+        <WordListImport />
         <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
           <button
             onClick={onReset}
@@ -165,6 +167,74 @@ function SettingsForm({ settings }: { settings: Settings }) {
         </div>
       </Group>
     </section>
+  )
+}
+
+/** Kendi kelime listesini (ör. Oxford 5000) CSV olarak içe aktarma; liste repoya değil tarayıcıya girer. */
+function WordListImport() {
+  const input = useRef<HTMLInputElement>(null)
+  const [state, setState] = useState<
+    | { phase: 'idle' }
+    | { phase: 'running'; done: number; total: number }
+    | { phase: 'done'; summary: ImportSummary }
+    | { phase: 'error'; text: string }
+  >({ phase: 'idle' })
+
+  async function run(file: File) {
+    const rows = parseWordList(await file.text())
+    if (rows.length === 0) {
+      setState({ phase: 'error', text: 'Dosyada kelime bulunamadı. İlk satır başlık olmalı.' })
+      return
+    }
+    setState({ phase: 'running', done: 0, total: rows.length })
+    try {
+      const summary = await importWordList(rows, (done) =>
+        setState({ phase: 'running', done, total: rows.length }),
+      )
+      setState({ phase: 'done', summary })
+    } catch {
+      setState({ phase: 'error', text: 'İçe aktarma sırasında bir hata oldu.' })
+    }
+  }
+
+  return (
+    <div className="space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+      <p className="font-medium">Kendi kelime listen</p>
+      <p className="text-xs text-zinc-500">
+        CSV dosyası: ilk satır başlık (ör. <code>word,pos,level,tr</code> ya da{' '}
+        <code>kelime;türkçe</code>). Listedeki kelimeler çalışma sırasının başına alınır; hazır
+        veride olmayanlar kendi kelimen olarak eklenir. Liste yalnızca bu tarayıcıda kalır.
+      </p>
+      <Button onClick={() => input.current?.click()}>Kelime listesi içe aktar (CSV)</Button>
+      <input
+        ref={input}
+        type="file"
+        accept=".csv,.tsv,.txt,text/csv"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          e.target.value = ''
+          if (f) void run(f)
+        }}
+      />
+      {state.phase === 'running' && (
+        <p role="status" className="text-sm text-zinc-500 tabular-nums">
+          İçe aktarılıyor… {state.done} / {state.total}
+        </p>
+      )}
+      {state.phase === 'done' && (
+        <p role="status" className="text-sm text-emerald-600 dark:text-emerald-400">
+          {state.summary.matched} kelime eşleşti ({state.summary.queued} tanesi sıraya alındı),{' '}
+          {state.summary.created} yeni kelime eklendi
+          {state.summary.skipped > 0 && `, ${state.summary.skipped} satır atlandı`}.
+        </p>
+      )}
+      {state.phase === 'error' && (
+        <p role="status" className="text-sm text-rose-600 dark:text-rose-400">
+          {state.text}
+        </p>
+      )}
+    </div>
   )
 }
 

@@ -1,11 +1,12 @@
 import { motion, type PanInfo } from 'motion/react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Loading } from '../../components/Loading'
 import { db, type Settings } from '../../db/db'
 import { useSettings } from '../../db/hooks'
 import { countIntroducedToday, previewCard, rateWord } from '../../db/repo'
 import { useWords } from '../../data/words'
+import { loadUserData, withUserExamples, type UserData } from '../../db/userWords'
 import { newWordOrder } from '../../srs/order'
 import { buildQueue, type QueueItem, type StoredCard } from '../../srs/queue'
 import {
@@ -37,15 +38,27 @@ export default function Study() {
   const levels = settings && snapshot ? neededLevels(settings, snapshot.cards) : undefined
   const words = useWords(levels)
 
+  // Hazır veri + kullanıcının eklediği kelimeler; makaleden eklenen cümleler örneklerin başına
+  const byId = useMemo(() => {
+    if (words.status !== 'ready' || !snapshot) return undefined
+    const map = new Map(words.byId)
+    for (const w of snapshot.user.words) map.set(w.id, w)
+    for (const id of snapshot.user.examples.keys()) {
+      const w = map.get(id)
+      if (w) map.set(id, withUserExamples(w, snapshot.user))
+    }
+    return map
+  }, [words, snapshot])
+
   if (settings && settings.levels.length === 0) return <Navigate to="/baslangic" replace />
   if (words.status === 'error') return <p className="py-10 text-red-500">{words.error}</p>
-  if (!settings || !snapshot || words.status === 'loading') return <Loading />
+  if (!settings || !snapshot || !byId) return <Loading />
 
   return (
     <StudySession
       settings={settings}
-      words={words.byId}
-      pool={words.list}
+      words={byId}
+      pool={words.status === 'ready' ? words.list : []}
       cards={snapshot.cards}
       introducedToday={snapshot.introducedToday}
       startedAt={snapshot.startedAt}
@@ -53,19 +66,20 @@ export default function Study() {
   )
 }
 
-type Snapshot = { cards: StoredCard[]; introducedToday: number; startedAt: Date }
+type Snapshot = { cards: StoredCard[]; introducedToday: number; startedAt: Date; user: UserData }
 
 async function loadSnapshot(): Promise<Snapshot> {
   const now = new Date()
   return {
     cards: await db.cards.toArray(),
     introducedToday: await countIntroducedToday(db, now),
+    user: await loadUserData(),
     startedAt: now,
   }
 }
 
 function neededLevels(settings: Settings, cards: StoredCard[]): Cefr[] {
-  const active = cards.filter((c) => c.status === 'active').map((c) => c.cefr)
+  const active = cards.flatMap((c) => (c.status === 'active' && c.cefr ? [c.cefr] : []))
   return [...new Set([...settings.levels, ...active])]
 }
 
@@ -81,9 +95,9 @@ type SessionProps = {
 function StudySession({ settings, words, pool, cards, introducedToday, startedAt }: SessionProps) {
   const [cardMap, setCardMap] = useState(() => new Map(cards.map((c) => [c.wordId, c])))
   const [session, setSession] = useState<Session>(() => {
-    const poolIds = newWordOrder(pool.filter((w) => settings.levels.includes(w.cefr))).map(
-      (w) => w.id,
-    )
+    const poolIds = newWordOrder(
+      pool.filter((w) => w.cefr && settings.levels.includes(w.cefr)),
+    ).map((w) => w.id)
     const queue = buildQueue({
       cards,
       poolIds,

@@ -5,7 +5,8 @@ import { State, type Card } from './scheduler'
 /** IndexedDB'deki kart kaydı: ts-fsrs kartı + kelime bilgisi. `due` indekslidir. */
 export type StoredCard = Card & {
   wordId: string
-  cefr: Cefr
+  /** Kullanıcının eklediği kelimelerde bilinmeyebilir */
+  cefr?: Cefr
   /** active: çalışma havuzunda · known: yerleştirmede "biliyorum" denildi, çalışılmaz */
   status: 'active' | 'known'
   addedAt: Date
