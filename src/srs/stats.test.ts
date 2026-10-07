@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { StoredCard } from './queue'
 import { newCard, State } from './scheduler'
-import { levelProgress, streak, wordStatus } from './stats'
+import { accuracy, dailyCounts, forecast, levelProgress, streak, wordStatus } from './stats'
 
 const now = new Date(2026, 9, 7, 12, 0)
 const card = (patch: Partial<StoredCard> = {}): StoredCard => ({
@@ -69,5 +69,38 @@ describe('levelProgress', () => {
       { cefr: 'B1', total: 100, done: 2, learning: 1 },
       { cefr: 'B2', total: 50, done: 1, learning: 0 },
     ])
+  })
+})
+
+describe('dailyCounts', () => {
+  it('son N günü bugün dahil sayar, boş günler 0', () => {
+    const d = dailyCounts([daysAgo(0), daysAgo(0), daysAgo(2), daysAgo(40)], now, 3)
+    expect(d.map((x) => [x.key, x.count])).toEqual([
+      ['2026-10-05', 1],
+      ['2026-10-06', 0],
+      ['2026-10-07', 2],
+    ])
+  })
+})
+
+describe('accuracy', () => {
+  it('"Tekrar" dışındakilerin oranı', () => {
+    expect(accuracy([1, 3, 3, 4])).toBe(0.75)
+    expect(accuracy([])).toBeUndefined()
+  })
+})
+
+describe('forecast', () => {
+  it('gecikmişler bugüne, sonrakiler kendi gününe; yeni ve "biliyorum" sayılmaz', () => {
+    const at = (d: number) => new Date(2026, 9, 7 + d, 10, 0)
+    const cards = [
+      card({ wordId: 'late', state: State.Review, due: at(-3) }),
+      card({ wordId: 't', state: State.Learning, due: new Date(2026, 9, 7, 18, 0) }),
+      card({ wordId: 'd2', state: State.Review, due: at(2) }),
+      card({ wordId: 'far', state: State.Review, due: at(30) }),
+      card({ wordId: 'new' }),
+      card({ wordId: 'known', status: 'known', state: State.Review, due: at(1) }),
+    ]
+    expect(forecast(cards, now, 3).map((d) => d.count)).toEqual([2, 0, 1])
   })
 })

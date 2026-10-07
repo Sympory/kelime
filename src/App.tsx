@@ -11,6 +11,7 @@ const Browse = lazy(() => import('./features/browse/Browse'))
 const Onboarding = lazy(() => import('./features/onboarding/Onboarding'))
 const Placement = lazy(() => import('./features/placement/Placement'))
 const SettingsPage = lazy(() => import('./features/settings/SettingsPage'))
+const StatsPage = lazy(() => import('./features/stats/StatsPage'))
 const Sources = lazy(() => import('./features/sources/Sources'))
 const Study = lazy(() => import('./features/study/Study'))
 const WordPage = lazy(() => import('./features/word/WordPage'))
@@ -51,6 +52,7 @@ export default function App() {
               <Route path="/kelimeler" element={<Browse />} />
               <Route path="/kelime/:id" element={<WordPage />} />
               <Route path="/ekle" element={<AddFromText />} />
+              <Route path="/istatistik" element={<StatsPage />} />
               <Route path="/ayarlar" element={<SettingsPage />} />
               <Route path="/kaynaklar" element={<Sources />} />
               <Route path="*" element={<Home />} />

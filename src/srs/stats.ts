@@ -62,3 +62,45 @@ export function levelProgress(
     }
   })
 }
+
+export type DayCount = { key: string; date: Date; count: number }
+
+/** Son `days` çalışma gününün (bugün dahil) tekrar sayıları, eskiden yeniye. */
+export function dailyCounts(reviewDates: Date[], now: Date, days = 30): DayCount[] {
+  const byKey = new Map<string, number>()
+  for (const d of reviewDates) byKey.set(dayKey(d), (byKey.get(dayKey(d)) ?? 0) + 1)
+  const out: DayCount[] = []
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(now)
+    date.setDate(date.getDate() - i)
+    const key = dayKey(date)
+    out.push({ key, date, count: byKey.get(key) ?? 0 })
+  }
+  return out
+}
+
+/** Doğru oranı: "Tekrar" (1) dışındaki değerlendirmelerin oranı; değerlendirme yoksa undefined. */
+export function accuracy(ratings: number[]): number | undefined {
+  if (ratings.length === 0) return undefined
+  return ratings.filter((r) => r !== 1).length / ratings.length
+}
+
+/**
+ * Önümüzdeki günlerin yükü: her gün vadesi gelecek kart sayısı (bugün, gecikmişleri de içerir).
+ * Yalnızca çalışılan (değerlendirilmiş) aktif kartlar sayılır; yeni kelimeler hariç.
+ */
+export function forecast(cards: StoredCard[], now: Date, days = 7): DayCount[] {
+  const out = dailyCounts([], now, 1).map((d) => ({ ...d }))
+  for (let i = 1; i < days; i++) {
+    const date = new Date(now)
+    date.setDate(date.getDate() + i)
+    out.push({ key: dayKey(date), date, count: 0 })
+  }
+  const index = new Map(out.map((d, i) => [d.key, i]))
+  for (const c of cards) {
+    if (c.status !== 'active' || c.state === State.New) continue
+    const i = c.due <= now ? 0 : index.get(dayKey(c.due))
+    if (i !== undefined) out[i].count++
+  }
+  return out
+}

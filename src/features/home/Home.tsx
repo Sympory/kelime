@@ -80,7 +80,12 @@ export default function Home() {
       )}
 
       <section className="mt-10">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">İlerleme</h2>
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">İlerleme</h2>
+          <Link to="/istatistik" className="text-xs font-medium underline underline-offset-4">
+            İstatistikler
+          </Link>
+        </div>
         <ul className="mt-3 space-y-3">
           {today.progress.map((p) => (
             <ProgressRow key={p.cefr} p={p} />
