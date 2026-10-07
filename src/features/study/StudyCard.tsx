@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
+import { AutoBadge } from '../../components/AutoBadge'
 import { CefrBadge } from '../../components/CefrBadge'
 import { Highlighted } from '../../components/Highlighted'
 import { POS_LABELS } from '../../components/pos'
@@ -84,6 +85,7 @@ function Back({ word, example }: { word: Word; example?: Example }) {
       {word.tr.length > 0 ? (
         <p className="mt-4 text-xl font-semibold text-amber-700 dark:text-amber-300">
           {word.tr.join(', ')}
+          {word.trAuto && <AutoBadge />}
         </p>
       ) : (
         <p className="mt-4 text-sm text-zinc-400 italic">Türkçe karşılık henüz yok</p>

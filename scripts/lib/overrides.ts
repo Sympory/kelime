@@ -13,6 +13,8 @@ function read<T>(file: string): Map<string, T> {
 export function loadOverrides() {
   return {
     tr: read<string[]>('tr.json'),
+    /** Yapay zekâ ile üretilmiş karşılıklar; yalnızca başka kaynakta Türkçe yoksa kullanılır */
+    trAuto: read<string[]>('tr-auto.json'),
     examples: read<Omit<Example, 'source'>[]>('examples.json'),
   }
 }

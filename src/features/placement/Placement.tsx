@@ -200,7 +200,14 @@ function SwipeCard({
       </p>
       <p className="mt-6 min-h-12 text-lg text-zinc-600 dark:text-zinc-300">
         {showMeaning ? (
-          meaning
+          <>
+            {meaning}
+            {word.trAuto && word.tr.length > 0 && (
+              <span className="ml-2 align-middle text-[10px] tracking-wide text-zinc-400 uppercase">
+                otomatik
+              </span>
+            )}
+          </>
         ) : (
           <span className="text-sm text-zinc-400">anlamı görmek için dokun</span>
         )}

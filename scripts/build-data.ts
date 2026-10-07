@@ -90,13 +90,18 @@ const words: Word[] = base.map((b) => {
       .map((ex) => withSpan({ ...ex, source: 'user' as const }, b.id))
   }
 
+  // Türkçe önceliği: topluluk düzeltmesi > Vikisözlük > yapay zekâ ile üretilmiş (işaretli)
+  const sourcedTr = overrides.tr.get(b.id) ?? turkish(b, info.tr)
+  const autoTr = sourcedTr.length === 0 ? overrides.trAuto.get(b.id) : undefined
+
   const word: Word = {
     id: b.id,
     lemma: b.lemma,
     pos: b.pos,
     cefr: b.cefr,
     defEn: info.defEn,
-    tr: overrides.tr.get(b.id) ?? turkish(b, info.tr),
+    tr: autoTr ?? sourcedTr,
+    ...(autoTr ? { trAuto: true as const } : {}),
     examples,
     collocations: collocations.get(b.id) ?? [],
     synonyms: [...new Set([...wordnet.synonyms(b.lemma, b.pos), ...info.synonyms])]
@@ -109,7 +114,11 @@ const words: Word[] = base.map((b) => {
 })
 
 const ids = new Set(words.map((w) => w.id))
-for (const id of [...overrides.tr.keys(), ...overrides.examples.keys()]) {
+for (const id of [
+  ...overrides.tr.keys(),
+  ...overrides.trAuto.keys(),
+  ...overrides.examples.keys(),
+]) {
   if (!ids.has(id)) console.warn(`⚠ overrides: bilinmeyen kelime kimliği "${id}"`)
 }
 

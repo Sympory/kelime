@@ -6,19 +6,23 @@
 
 Her sütun, o alanı dolu olan kelimelerin oranıdır.
 
-| Seviye | Kelime | Türkçe | Tanım | IPA | Örnek | Çevirili örnek | Collocation | Eş anlamlı | Kelime ailesi |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A1 | 1142 | 93% | 98% | 99% | 100% | 100% | 88% | 90% | 59% |
-| A2 | 1397 | 85% | 99% | 97% | 100% | 100% | 95% | 93% | 65% |
-| B1 | 2433 | 79% | 99% | 96% | 100% | 98% | 97% | 91% | 69% |
-| B2 | 2772 | 69% | 99% | 93% | 99% | 91% | 98% | 89% | 67% |
-| C1 | 1046 | 50% | 98% | 84% | 93% | 72% | 99% | 82% | 67% |
-| C2 | 933 | 42% | 98% | 81% | 86% | 48% | 98% | 81% | 64% |
-| Toplam | 9723 | 72% | 99% | 93% | 97% | 89% | 96% | 89% | 66% |
+| Seviye | Kelime | Türkçe (kaynaklı) | Türkçe (otomatik dahil) | Tanım | IPA | Örnek | Çevirili örnek | Collocation | Eş anlamlı | Kelime ailesi |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| A1 | 1142 | 93% | 100% | 98% | 99% | 100% | 100% | 88% | 90% | 59% |
+| A2 | 1397 | 85% | 100% | 99% | 97% | 100% | 100% | 95% | 93% | 65% |
+| B1 | 2433 | 79% | 100% | 99% | 96% | 100% | 98% | 97% | 91% | 69% |
+| B2 | 2772 | 69% | 100% | 99% | 93% | 99% | 91% | 98% | 89% | 67% |
+| C1 | 1046 | 50% | 100% | 98% | 84% | 93% | 72% | 99% | 82% | 67% |
+| C2 | 933 | 42% | 100% | 98% | 81% | 86% | 48% | 98% | 81% | 64% |
+| Toplam | 9723 | 72% | 100% | 99% | 93% | 97% | 89% | 96% | 89% | 66% |
 
 ## Türkçe karşılığı eksik kelimeler
 
-Katkı vermek için [`data/overrides/tr.json`](overrides/tr.json) dosyasına ekleyin (bkz. [README](overrides/README.md)).
+Yok — her kelimenin bir Türkçe karşılığı var.
+
+## Gözden geçirilmeyi bekleyen otomatik çeviriler
+
+Bu kelimelerin Türkçesi Vikisözlük’te bulunmadığı için yapay zekâ ile üretildi ([`tr-auto.json`](overrides/tr-auto.json)); uygulamada “otomatik” etiketiyle görünür. Yanlış ya da eksik bulduğunuzu [`tr.json`](overrides/tr.json) ile düzeltin — düzeltme otomatik çevirinin yerine geçer ve etiket kalkar.
 
 <details><summary><strong>A1</strong> — 83 kelime</summary>
 

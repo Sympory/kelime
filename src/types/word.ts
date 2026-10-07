@@ -23,6 +23,8 @@ export type Word = {
   ipa?: string
   defEn: string[] // kısa İngilizce tanımlar (en fazla 2)
   tr: string[] // Türkçe karşılıklar
+  /** Türkçe karşılıklar yapay zekâ ile üretildi (data/overrides/tr-auto.json); gözden geçirilmeli */
+  trAuto?: true
   examples: Example[] // en fazla 3
   collocations: string[] // "deteriorate rapidly", "health deteriorated"
   synonyms: string[]
