@@ -10,12 +10,15 @@ export type Settings = {
   levels: Cefr[]
   dailyNewLimit: number
   placementDone: boolean
+  /** Telaffuz aksanı (Web Speech API dil kodu) */
+  accent: 'en-US' | 'en-GB'
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   levels: [],
   dailyNewLimit: 10,
   placementDone: false,
+  accent: 'en-US',
 }
 
 type SettingRow = { key: keyof Settings; value: Settings[keyof Settings] }

@@ -59,6 +59,19 @@ export function useWords(levels: Cefr[] | undefined): WordsState {
   return state
 }
 
+/**
+ * Kelimeyi kimliğiyle bulur. Kimlik seviyeyi içermediği için önce `preferred` seviyelere,
+ * sonra diğerlerine bakılır (yüklenen seviyeler önbellekte kalır).
+ */
+export async function findWord(id: string, preferred: Cefr[] = []): Promise<Word | undefined> {
+  const order = [...new Set([...preferred, ...LEVELS])]
+  for (const level of order) {
+    const hit = (await loadLevel(level)).find((w) => w.id === id)
+    if (hit) return hit
+  }
+  return undefined
+}
+
 /** Başlangıçta seçilen seviyeden C1'e kadar (C1/C2 seçildiyse C2 de) çalışılır. */
 export function levelsFrom(start: Cefr): Cefr[] {
   const i = LEVELS.indexOf(start)

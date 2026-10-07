@@ -143,8 +143,10 @@ kelime/
 - Algoritma için birim testleri (Vitest).
 - _Kararlar:_ gün 04:00'te döner; öğrenme adımları 1 dk / 10 dk, yeniden öğrenme 10 dk; 20 dk içinde vadesi gelecek öğrenme kartları oturumda kalır; yeni kelimeler kimliğe göre kararlı karışık sırayla gelir (veri alfabetik); kart ön yüzünde her tekrarda farklı örnek cümle; telefonda kartı sağa kaydır = İyi, sola = Tekrar.
 
-**Faz 3 — Gezgin, detay ve ana sayfa**
+**Faz 3 — Gezgin, detay ve ana sayfa** ✅
 - Kelime gezgini, detay sayfası, ana sayfa ilerleme göstergeleri, telaffuz.
+- _Kararlar:_ tekrar aralığı ≥ 21 gün olan kelime "öğrenildi" sayılır (ilerleme çubuğunda "biliyorum" ile birlikte); seri, bugün henüz çalışılmadıysa dünden sayılır; gezgin filtreleri adreste tutulur (`/kelimeler?q=…&seviye=…`); aksan ayarı (`en-US`/`en-GB`) veritabanında, seçim arayüzü Faz 4 ayarlarında.
+- _Ek:_ eksik ~2.700 Türkçe karşılık yapay zekâ ile tamamlandı (`data/overrides/tr-auto.json`, uygulamada "otomatik" etiketli).
 
 **Faz 4 — Makaleden ekleme, istatistik, ayarlar**
 - Makaleden ekle akışı, istatistik sayfası, JSON/CSV içe-dışa aktarma, PWA.
