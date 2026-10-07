@@ -22,9 +22,11 @@ type Props = {
   example?: Example
   flipped: boolean
   onFlip: () => void
+  /** en-tr: cümledeki kelimeyi tanı · tr-en: Türkçeden İngilizceyi hatırla */
+  direction?: 'en-tr' | 'tr-en'
 }
 
-export function StudyCard({ word, kind, example, flipped, onFlip }: Props) {
+export function StudyCard({ word, kind, example, flipped, onFlip, direction = 'en-tr' }: Props) {
   return (
     <div className="[perspective:1200px]">
       <AnimatePresence mode="wait" initial={false}>
@@ -48,11 +50,44 @@ export function StudyCard({ word, kind, example, flipped, onFlip }: Props) {
           </header>
           {flipped ? (
             <Back word={word} example={example} />
+          ) : direction === 'tr-en' ? (
+            <FrontReverse word={word} example={example} />
           ) : (
             <Front word={word} example={example} />
           )}
         </motion.article>
       </AnimatePresence>
+    </div>
+  )
+}
+
+/** Türkçeden İngilizceye: Türkçe karşılık + kelimesi boşluk olarak gizlenmiş örnek cümle */
+function FrontReverse({ word, example }: { word: Word; example?: Example }) {
+  const hint = word.tr.length ? word.tr.join(', ') : word.defEn[0]
+  return (
+    <div className="flex min-h-56 flex-col justify-center py-6">
+      <p className="font-display text-center text-3xl font-bold text-amber-700 sm:text-4xl dark:text-amber-300">
+        {hint}
+      </p>
+      {example?.hl && (
+        <p className="mt-6 text-center text-lg leading-snug text-zinc-600 dark:text-zinc-300">
+          {example.en.slice(0, example.hl[0])}
+          <span
+            className="mx-0.5 inline-block min-w-16 border-b-2 border-amber-400 align-baseline"
+            aria-label="boşluk"
+          >
+            &nbsp;
+          </span>
+          {example.en.slice(example.hl[1])}
+        </p>
+      )}
+      {example?.tr && example.hl && (
+        <p className="mt-2 text-center text-sm text-zinc-500">{example.tr}</p>
+      )}
+      <p className="mt-8 text-center text-sm text-zinc-400">
+        İngilizcesini hatırla, sonra çevir{' '}
+        <kbd className="ml-1 hidden rounded border px-1 text-xs sm:inline">Boşluk</kbd>
+      </p>
     </div>
   )
 }

@@ -13,10 +13,8 @@
   --color-cefr-c2: #7c3aed;
 }
 
-/* Koyu tema öncelikli; açık tema sistem tercihiyle */
-:root {
-  color-scheme: dark light;
-}
+/* Tema <html class="dark"> ile seçilir (ayarlar: sistem / açık / koyu); bkz. src/lib/theme.ts */
+@custom-variant dark (&:where(.dark, .dark *));
 
 body {
   @apply min-h-dvh bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;

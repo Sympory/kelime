@@ -195,6 +195,7 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
           example={example}
           flipped={flipped}
           onFlip={flip}
+          direction={settings.direction}
         />
       </motion.div>
 

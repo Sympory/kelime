@@ -12,6 +12,9 @@ export type Settings = {
   placementDone: boolean
   /** Telaffuz aksanı (Web Speech API dil kodu) */
   accent: 'en-US' | 'en-GB'
+  /** en-tr: cümledeki kelimeyi tanı (varsayılan) · tr-en: Türkçeden İngilizceyi hatırla */
+  direction: 'en-tr' | 'tr-en'
+  theme: 'system' | 'light' | 'dark'
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -19,6 +22,8 @@ export const DEFAULT_SETTINGS: Settings = {
   dailyNewLimit: 10,
   placementDone: false,
   accent: 'en-US',
+  direction: 'en-tr',
+  theme: 'system',
 }
 
 type SettingRow = { key: keyof Settings; value: Settings[keyof Settings] }
