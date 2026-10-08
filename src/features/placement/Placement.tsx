@@ -171,7 +171,18 @@ function SwipeCard({
       onDragEnd={onDragEnd}
       initial={{ scale: 0.95, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      exit={{ x: exitDir * 400, opacity: 0, transition: { duration: 0.2 } }}
+      // Yön AnimatePresence'ın `custom` değerinden okunur: düğmeyle karar verildiğinde de kart
+      // o anki yöne doğru eğilerek uçar (kartın eski prop'u değil, güncel karar kullanılır)
+      custom={exitDir}
+      exit="exit"
+      variants={{
+        exit: (dir: number) => ({
+          x: dir * 420,
+          rotate: dir * 16,
+          opacity: 0,
+          transition: { duration: 0.28, ease: [0.4, 0, 1, 1] },
+        }),
+      }}
       transition={{ duration: 0.15 }}
       onTap={onToggleMeaning}
       className="surface relative w-full max-w-md cursor-grab touch-pan-y p-8 text-center select-none active:cursor-grabbing"

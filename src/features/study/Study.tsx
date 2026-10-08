@@ -109,7 +109,9 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
     return startSession(queue)
   })
   const [current, setCurrent] = useState<QueueItem | undefined>(() => nextItem(session, startedAt))
-  const [flipped, setFlipped] = useState(false)
+  // revealed: cevap bir kez görüldü (puan düğmeleri açılır) · showBack: şu an görünen yüz
+  const [revealed, setRevealed] = useState(false)
+  const [showBack, setShowBack] = useState(false)
   const [intervals, setIntervals] = useState<Record<Grade, string>>()
   const [exitDir, setExitDir] = useState(1)
   const busy = useRef(false)
@@ -121,8 +123,13 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
     ? word.examples[(stored?.reps ?? 0) % word.examples.length]
     : undefined
 
+  /** Kartı çevirir; ilk çevirmede aralık önizlemesini hesaplayıp puan düğmelerini açar. */
   const flip = useCallback(() => {
-    if (!word || flipped) return
+    if (!word) return
+    if (revealed) {
+      setShowBack((b) => !b)
+      return
+    }
     const now = new Date()
     const p = preview(previewCard(stored, word, now), now)
     setIntervals(
@@ -130,12 +137,13 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
         GRADES.map((g) => [g, formatInterval(p[g].getTime() - now.getTime())]),
       ) as Record<Grade, string>,
     )
-    setFlipped(true)
-  }, [word, stored, flipped])
+    setRevealed(true)
+    setShowBack(true)
+  }, [word, stored, revealed])
 
   const grade = useCallback(
     async (g: Grade) => {
-      if (!current || !word || !flipped || busy.current) return
+      if (!current || !word || !revealed || busy.current) return
       busy.current = true
       try {
         setExitDir(EXIT_DIR[g])
@@ -145,27 +153,28 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
         setCardMap((m) => new Map(m).set(updated.wordId, updated))
         setSession(next)
         setCurrent(nextItem(next, new Date()))
-        setFlipped(false)
+        setRevealed(false)
+        setShowBack(false)
       } finally {
         busy.current = false
       }
     },
-    [current, word, flipped, session],
+    [current, word, revealed, session],
   )
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return
-      if ((e.key === ' ' || e.key === 'Enter') && !flipped) {
+      if (e.key === ' ' || (e.key === 'Enter' && !revealed)) {
         e.preventDefault()
         flip()
-      } else if (flipped && ['1', '2', '3', '4'].includes(e.key)) {
+      } else if (revealed && ['1', '2', '3', '4'].includes(e.key)) {
         void grade(Number(e.key) as Grade)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [flip, grade, flipped])
+  }, [flip, grade, revealed])
 
   if (!current || !word) {
     return <Summary answered={session.answered} startedAt={startedAt} />
@@ -176,7 +185,7 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
   const progress = session.answered.length / Math.max(1, session.answered.length + remaining)
 
   function onDragEnd(_: unknown, info: PanInfo) {
-    if (!flipped) return
+    if (!revealed) return
     if (info.offset.x > 100) void grade(Rating.Good)
     else if (info.offset.x < -100) void grade(Rating.Again)
   }
@@ -236,14 +245,14 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
             variants={{
               // Puan yönüne göre çıkış: Tekrar sola, İyi/Kolay sağa, Zor yukarı
               exit: (dir: number) => ({
-                x: dir * 320,
+                x: dir * 420,
                 y: dir === 0 ? -40 : 0,
-                rotate: dir * 8,
+                rotate: dir * 14,
                 opacity: 0,
-                transition: { duration: 0.22, ease: 'easeIn' },
+                transition: { duration: 0.28, ease: [0.4, 0, 1, 1] },
               }),
             }}
-            drag={flipped ? 'x' : false}
+            drag={revealed ? 'x' : false}
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.6}
             onDragEnd={onDragEnd}
@@ -253,7 +262,7 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
               word={word}
               kind={current.kind}
               example={example}
-              flipped={flipped}
+              flipped={showBack}
               onFlip={flip}
               direction={settings.direction}
             />
@@ -263,7 +272,7 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
 
       {/* Başparmak erişimi için butonlar altta, kaydırırken görünür kalır */}
       <div className="sticky bottom-0 mt-4 pt-3 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
-        {flipped ? (
+        {revealed ? (
           <div className="grid grid-cols-4 gap-2">
             {GRADES.map((g) => (
               <button
