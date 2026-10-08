@@ -1,0 +1,41 @@
+name: Veri düzeltmesi
+description: Yanlış ya da eksik Türkçe karşılık, örnek cümle, tanım
+title: '[Veri] '
+labels: ['veri']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Kod bilmeden doğrudan PR da gönderebilirsin: [CONTRIBUTING.md → Veri düzeltmesi](https://github.com/Sympory/kelime/blob/main/CONTRIBUTING.md#1-veri-d%C3%BCzeltmesi-kod-gerekmez).
+        PR göndermek istemiyorsan bu formu doldurman yeterli.
+  - type: input
+    id: word
+    attributes:
+      label: Kelime
+      description: Kelimenin kendisi ya da kimliği (detay sayfasının adresindeki, ör. `decline-v`)
+      placeholder: decline-v
+    validations:
+      required: true
+  - type: dropdown
+    id: field
+    attributes:
+      label: Ne yanlış ya da eksik?
+      options:
+        - Türkçe karşılık
+        - Örnek cümle / çevirisi
+        - İngilizce tanım
+        - Seviye (CEFR) ya da tür
+        - Diğer
+    validations:
+      required: true
+  - type: textarea
+    id: now
+    attributes:
+      label: Şu an ne yazıyor?
+  - type: textarea
+    id: should
+    attributes:
+      label: Ne olmalı?
+      description: Türkçe karşılıklarda en yaygın anlam önce, en fazla 4 karşılık.
+    validations:
+      required: true

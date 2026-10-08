@@ -1,0 +1,34 @@
+name: Hata bildirimi
+description: Uygulamada bir şey beklendiği gibi çalışmıyor
+title: '[Hata] '
+labels: ['bug']
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Ne oldu?
+      description: Kısaca ne beklediğini ve ne olduğunu yaz.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Nasıl tekrarlanır?
+      placeholder: |
+        1. Çalış ekranını aç
+        2. Kartı çevir
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Cihaz ve tarayıcı
+      placeholder: iPhone 13 / Safari, Windows / Chrome 141, ana ekrana eklenmiş uygulama…
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Ekran görüntüsü (isteğe bağlı)
+      description: Görüntüyü buraya sürükleyip bırakabilirsin.

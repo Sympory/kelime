@@ -1,8 +1,9 @@
 @import 'tailwindcss';
+@import './fonts.css';
 
 @theme {
-  --font-display: 'Fraunces', ui-serif, Georgia, serif;
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
   /* CEFR seviye renkleri: A1 yeşil → C2 mor */
   --color-cefr-a1: #22c55e;
