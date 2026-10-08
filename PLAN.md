@@ -161,9 +161,10 @@ kelime/
 - Boş/yükleniyor durumları (iskelet ekranlar), mobilde başparmak erişimi gözden geçirmesi.
 - _Yapılan:_ ortak tasarım sınıfları (`surface` buzlu cam yüzey, `btn-primary`/`btn-brand`/`btn-ghost`, `field`, `chip`, `eyebrow`); marka renkleri logodan (amber + mor); sıcak kırık beyaz / mürekkep zemin, köşelerde ışık haleleri ve ince doku; telefonda alt sekme çubuğu (ortada öne çıkan Ekle), masaüstünde hap menü; sayfa geçişi, ilerleme çubuğu dolması, puan yönüne göre kart çıkışı, kaydırma renklenmesi, seri alevi, oturum sonu konfeti ve doğru oranı halkası; iskelet yükleniyor ekranı. Animasyon kütüphanesi ana pakete girmedi (geçişler CSS).
 
-**Faz 6 — Açık kaynak cilası**
+**Faz 6 — Açık kaynak cilası** ✅
 - CONTRIBUTING.md (veri düzeltme nasıl yapılır, PR akışı), issue/PR şablonları, "good first issue" etiketleri.
 - Lighthouse: performans ve erişilebilirlik ≥ 90.
+- _Yapılan:_ CONTRIBUTING.md (kod bilmeden veri düzeltme adımları, kod katkısı, kurallar), issue formları (veri düzeltmesi, hata, öneri), PR şablonu. Performans: Google Fonts yerine kendi sunucumuzdan fontlar (latin + latin-ext), zamanlayıcı kütüphanesi ana sayfadan ayrıldı, açılış ekranı, font ön yükleme, başlangıç sayfası ana pakette. Lighthouse (mobil, yerel ölçüm): **erişilebilirlik 100, en iyi uygulamalar 100, performans 85–90** (ölçüm makinesinde antivirüs HTTPS denetimi gürültü ekliyor; temiz ölçüm için PageSpeed Insights).
 
 ## Arkadaşlarla çalışma
 

@@ -1,0 +1,22 @@
+name: Öneri
+description: Yeni özellik ya da iyileştirme fikri
+title: '[Öneri] '
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Hangi sorunu çözüyor?
+      description: Çalışırken neyi zor ya da eksik buluyorsun?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Fikrin
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        Not: Uygulama ücretsiz ve sunucusuz kalmalı (hesap, ücretli API, veritabanı yok). Arkadaşlık ve challenge gibi sosyal fikirler [PLAN.md](https://github.com/Sympory/kelime/blob/main/PLAN.md)'de "İleride" başlığında.

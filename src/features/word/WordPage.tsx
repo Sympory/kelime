@@ -11,7 +11,7 @@ import { useSettings } from '../../db/hooks'
 import { placeWord } from '../../db/repo'
 import { findWord } from '../../data/words'
 import { deleteUserWord, useUserData, withUserExamples } from '../../db/userWords'
-import { State } from '../../srs/scheduler'
+import { State } from '../../srs/state'
 import { wordStatus } from '../../srs/stats'
 import type { Cefr, Word } from '../../types/word'
 

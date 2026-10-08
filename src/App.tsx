@@ -4,12 +4,13 @@ import { BooksIcon, ChartIcon, GearIcon, HomeIcon, LogoMark, PlusIcon } from './
 import { Loading } from './components/Loading'
 import { useSettings } from './db/hooks'
 import Home from './features/home/Home'
+// İlk ziyarette doğrudan açılır: ayrı parça olarak beklenmesin (LCP)
+import Onboarding from './features/onboarding/Onboarding'
 import { useApplyTheme } from './lib/theme'
 
 // Ana sayfa dışındaki ekranlar ayrı parçalarda: ilk açılış hızlı olsun
 const AddFromText = lazy(() => import('./features/add/AddFromText'))
 const Browse = lazy(() => import('./features/browse/Browse'))
-const Onboarding = lazy(() => import('./features/onboarding/Onboarding'))
 const Placement = lazy(() => import('./features/placement/Placement'))
 const SettingsPage = lazy(() => import('./features/settings/SettingsPage'))
 const StatsPage = lazy(() => import('./features/stats/StatsPage'))

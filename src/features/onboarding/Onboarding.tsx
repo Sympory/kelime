@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CefrBadge } from '../../components/CefrBadge'
 import { db } from '../../db/db'
-import { saveSettings } from '../../db/repo'
+import { saveSettings } from '../../db/settings'
 import { levelsFrom, LEVELS } from '../../data/words'
 import type { Cefr } from '../../types/word'
 
