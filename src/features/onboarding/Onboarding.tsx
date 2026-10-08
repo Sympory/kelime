@@ -27,7 +27,10 @@ export default function Onboarding() {
 
   return (
     <section className="py-8">
-      <h1 className="font-display text-4xl font-bold tracking-tight">Seviyeni seç</h1>
+      <p className="eyebrow">Hoş geldin</p>
+      <h1 className="font-display mt-1 text-4xl font-bold tracking-tight sm:text-5xl">
+        Seviyeni seç
+      </h1>
       <p className="mt-3 text-zinc-600 dark:text-zinc-400">
         Seçtiğin seviyeden C1’e kadar olan kelimeler çalışma havuzuna girer. Daha alt seviyeleri
         baştan çalışmak zorunda kalmazsın.
@@ -39,20 +42,21 @@ export default function Onboarding() {
             key={l}
             onClick={() => setLevel(l)}
             aria-pressed={level === l}
-            className={`flex items-center gap-4 rounded-2xl border px-4 py-3 text-left transition-colors ${
+            className={`surface flex items-center gap-4 rounded-2xl px-4 py-3.5 text-left transition-[transform,box-shadow] duration-150 active:scale-[0.98] ${
               level === l
-                ? 'border-zinc-900 bg-zinc-900/5 dark:border-zinc-100 dark:bg-zinc-100/10'
-                : 'border-zinc-200 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600'
+                ? 'ring-2 ring-amber-400 dark:ring-amber-400'
+                : 'hover:ring-zinc-900/15 dark:hover:ring-white/20'
             }`}
           >
             <CefrBadge level={l} className="w-10 text-center" />
             <span className="text-sm">{DESCRIPTIONS[l]}</span>
+            {level === l && <span className="animate-pop ml-auto text-amber-500">✓</span>}
           </button>
         ))}
       </div>
 
       {level && (
-        <div className="mt-8 rounded-2xl bg-zinc-100 p-5 dark:bg-zinc-900">
+        <div className="surface animate-page-in mt-8 p-5">
           <p className="font-medium">
             Çalışılacak seviyeler:{' '}
             {levelsFrom(level).map((l) => (
@@ -64,16 +68,10 @@ export default function Onboarding() {
             bilmediklerin çalışılır. İstediğin zaman bırakabilirsin.
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-            <button
-              onClick={() => start(true)}
-              className="rounded-xl bg-zinc-900 px-5 py-3 font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
-            >
+            <button onClick={() => start(true)} className="btn-brand">
               Hızlı elemeye başla
             </button>
-            <button
-              onClick={() => start(false)}
-              className="rounded-xl px-5 py-3 font-semibold text-zinc-600 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            >
+            <button onClick={() => start(false)} className="btn-ghost px-5 py-3">
               Elemeden çalışmaya geç
             </button>
           </div>

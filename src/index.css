@@ -11,13 +11,98 @@
   --color-cefr-b2: #f97316;
   --color-cefr-c1: #a855f7;
   --color-cefr-c2: #7c3aed;
+
+  /* Marka: logodaki amber kart ve mor kart */
+  --color-brand: #f59e0b;
+  --color-brand-soft: #fcd34d;
+  --color-accent: #a855f7;
+
+  /* Zemin: koyu tema öncelikli; açık tema sıcak kırık beyaz */
+  --color-paper: #faf7f2;
+  --color-ink: #0b0b10;
+
+  --ease-out-quick: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Tema <html class="dark"> ile seçilir (ayarlar: sistem / açık / koyu); bkz. src/lib/theme.ts */
 @custom-variant dark (&:where(.dark, .dark *));
 
 body {
-  @apply min-h-dvh bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+  @apply bg-paper dark:bg-ink min-h-dvh font-sans text-zinc-900 antialiased dark:text-zinc-100;
+}
+
+/*
+ * Arka plan: köşelerde marka renklerinden yumuşak ışık haleleri + çok ince tahıl dokusu.
+ * Sabit (fixed) katman; içerik kaydıkça hareket etmez, GPU'da tek kez çizilir.
+ */
+.app-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40rem 28rem at 12% -6%, rgb(245 158 11 / 0.16), transparent 70%),
+    radial-gradient(36rem 30rem at 105% 8%, rgb(168 85 247 / 0.14), transparent 70%),
+    radial-gradient(42rem 30rem at 50% 115%, rgb(34 197 94 / 0.08), transparent 70%);
+}
+.dark .app-backdrop {
+  background:
+    radial-gradient(40rem 28rem at 12% -6%, rgb(245 158 11 / 0.14), transparent 70%),
+    radial-gradient(36rem 30rem at 105% 8%, rgb(168 85 247 / 0.18), transparent 70%),
+    radial-gradient(42rem 30rem at 50% 115%, rgb(34 197 94 / 0.07), transparent 70%);
+}
+.app-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.dark .app-backdrop::after {
+  opacity: 0.06;
+}
+
+/* Yüzey: buzlu cam kart. Tüm kutular, listeler ve kartlar bunu kullanır. */
+@utility surface {
+  @apply rounded-3xl bg-white/75 shadow-[0_1px_0_rgb(255_255_255/0.6)_inset,0_10px_30px_-12px_rgb(24_24_27/0.18)] ring-1 ring-zinc-900/5 backdrop-blur-xl dark:bg-zinc-900/60 dark:shadow-[0_1px_0_rgb(255_255_255/0.06)_inset,0_10px_30px_-12px_rgb(0_0_0/0.6)] dark:ring-white/10;
+}
+
+/* Birincil düğme: mürekkep rengi, basınca hafifçe küçülür */
+@utility btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-zinc-900 px-5 py-3 font-semibold text-white shadow-lg shadow-zinc-900/20 transition-[transform,background-color,box-shadow] duration-150 hover:bg-zinc-800 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 dark:bg-white dark:text-zinc-900 dark:shadow-black/40 dark:hover:bg-zinc-100;
+}
+
+/* Vurgu düğmesi: marka degradesi (ana eylemler: "Çalışmaya başla") */
+@utility btn-brand {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-linear-to-br from-amber-300 via-amber-400 to-orange-500 px-5 py-3 font-semibold text-zinc-950 shadow-lg shadow-amber-500/30 transition-[transform,filter,box-shadow] duration-150 hover:brightness-105 active:scale-[0.97];
+}
+
+@utility btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 font-semibold text-zinc-600 transition-[transform,background-color] duration-150 hover:bg-zinc-900/5 active:scale-[0.97] dark:text-zinc-300 dark:hover:bg-white/10;
+}
+
+/* Giriş kutuları: cam yüzeyle uyumlu, odakta amber halka */
+@utility field {
+  @apply w-full rounded-xl border border-zinc-900/10 bg-white/70 px-3 py-2 text-sm transition-shadow outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-400/20 dark:border-white/10 dark:bg-zinc-900/60;
+}
+
+@utility chip {
+  @apply rounded-full bg-zinc-900/5 px-2.5 py-1 text-sm dark:bg-white/10;
+}
+
+@utility eyebrow {
+  @apply text-xs font-semibold tracking-[0.12em] text-zinc-500 uppercase;
+}
+
+/* Hareket azaltma tercihi: tüm geçiş ve animasyonları neredeyse sıfıra indir */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /*
@@ -39,4 +124,96 @@ body {
   --chart-seq-3: #6da7ec;
   --chart-seq-4: #b7d3f6;
   --chart-bar: #3987e5;
+}
+
+/* Sayfa girişi: kısa yükselme + belirme (App.tsx'te her rota değişiminde) */
+@theme {
+  --animate-page-in: page-in 220ms var(--ease-out-quick) both;
+  --animate-pop: pop 360ms var(--ease-out-quick) both;
+  --animate-flame: flame 1.6s ease-in-out infinite;
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+@keyframes flame {
+  0%,
+  100% {
+    transform: scale(1) rotate(-2deg);
+  }
+  50% {
+    transform: scale(1.08) rotate(3deg);
+  }
+}
+@theme {
+  --animate-grow: grow 700ms var(--ease-out-quick) both;
+}
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+@theme {
+  --animate-ring: ring 900ms var(--ease-out-quick) 150ms both;
+  --animate-confetti: confetti 1100ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+@keyframes ring {
+  from {
+    stroke-dashoffset: var(--ring-from);
+  }
+}
+/* Yukarı fırla, sonra yerçekimiyle düşüp kaybol */
+@keyframes confetti {
+  0% {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+  45% {
+    transform: translate(calc(var(--dx) * 0.7), var(--dy)) rotate(calc(var(--rot) * 0.5));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), calc(var(--dy) * -0.6)) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+/* İskelet: soldan sağa kayan hafif parıltı */
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    rgb(24 24 27 / 0.06) 30%,
+    rgb(24 24 27 / 0.12) 50%,
+    rgb(24 24 27 / 0.06) 70%
+  );
+  background-size: 300% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+.dark .skeleton {
+  background-image: linear-gradient(
+    100deg,
+    rgb(255 255 255 / 0.05) 30%,
+    rgb(255 255 255 / 0.1) 50%,
+    rgb(255 255 255 / 0.05) 70%
+  );
+}
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
 }

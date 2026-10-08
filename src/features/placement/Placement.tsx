@@ -108,14 +108,14 @@ function PlacementDeck({ words, seen }: { words: Word[]; seen: Set<string> }) {
         <button
           onClick={() => decide(false)}
           disabled={!current}
-          className="rounded-2xl bg-rose-500/15 py-4 font-semibold text-rose-600 disabled:opacity-40 dark:text-rose-400"
+          className="rounded-2xl bg-rose-500/15 py-4 font-semibold text-rose-600 ring-1 ring-rose-500/20 backdrop-blur-xl transition-transform duration-150 active:scale-95 disabled:opacity-40 dark:text-rose-400"
         >
           ← Bilmiyorum
         </button>
         <button
           onClick={() => decide(true)}
           disabled={!current}
-          className="rounded-2xl bg-emerald-500/15 py-4 font-semibold text-emerald-700 disabled:opacity-40 dark:text-emerald-400"
+          className="rounded-2xl bg-emerald-500/15 py-4 font-semibold text-emerald-700 ring-1 ring-emerald-500/20 backdrop-blur-xl transition-transform duration-150 active:scale-95 disabled:opacity-40 dark:text-emerald-400"
         >
           Biliyorum →
         </button>
@@ -174,25 +174,36 @@ function SwipeCard({
       exit={{ x: exitDir * 400, opacity: 0, transition: { duration: 0.2 } }}
       transition={{ duration: 0.15 }}
       onTap={onToggleMeaning}
-      className="relative w-full max-w-md cursor-grab touch-pan-y rounded-3xl bg-white p-8 text-center shadow-xl shadow-zinc-900/10 select-none active:cursor-grabbing dark:bg-zinc-900 dark:shadow-black/40"
+      className="surface relative w-full max-w-md cursor-grab touch-pan-y p-8 text-center select-none active:cursor-grabbing"
     >
+      {/* Kaydırma yönüne göre kartın renklenmesi */}
       <motion.span
         aria-hidden
         style={{ opacity: knownOpacity }}
-        className="absolute top-5 left-5 rounded-lg border-2 border-emerald-500 px-2 py-0.5 text-sm font-bold text-emerald-500"
+        className="absolute inset-0 rounded-3xl bg-linear-to-br from-emerald-400/25 to-transparent"
+      />
+      <motion.span
+        aria-hidden
+        style={{ opacity: unknownOpacity }}
+        className="absolute inset-0 rounded-3xl bg-linear-to-bl from-rose-400/25 to-transparent"
+      />
+      <motion.span
+        aria-hidden
+        style={{ opacity: knownOpacity }}
+        className="absolute top-5 left-5 -rotate-12 rounded-lg border-2 border-emerald-500 px-2 py-0.5 text-sm font-bold text-emerald-500"
       >
         BİLİYORUM
       </motion.span>
       <motion.span
         aria-hidden
         style={{ opacity: unknownOpacity }}
-        className="absolute top-5 right-5 rounded-lg border-2 border-rose-500 px-2 py-0.5 text-sm font-bold text-rose-500"
+        className="absolute top-5 right-5 rotate-12 rounded-lg border-2 border-rose-500 px-2 py-0.5 text-sm font-bold text-rose-500"
       >
         BİLMİYORUM
       </motion.span>
 
       <CefrBadge level={word.cefr} />
-      <p className="font-display mt-6 text-5xl font-bold tracking-tight break-words">
+      <p className="font-display relative mt-6 text-5xl font-bold tracking-tight break-words">
         {word.lemma}
       </p>
       <p className="mt-2 flex items-center justify-center gap-1 text-sm text-zinc-500">

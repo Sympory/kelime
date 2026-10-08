@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link, Navigate } from 'react-router-dom'
 import { CefrBadge } from '../../components/CefrBadge'
+import { FlameIcon, SparkIcon } from '../../components/icons'
 import { Loading } from '../../components/Loading'
 import { db } from '../../db/db'
 import { useSettings } from '../../db/hooks'
@@ -8,7 +9,8 @@ import { countIntroducedToday, getSettings } from '../../db/repo'
 import { loadIndex } from '../../data/words'
 import { isDueLearning, isDueReview } from '../../srs/queue'
 import { State } from '../../srs/scheduler'
-import { levelProgress, streak, type LevelProgress } from '../../srs/stats'
+import { dayStart } from '../../srs/day'
+import { levelProgress, streak, wordStatus, type LevelProgress } from '../../srs/stats'
 
 export default function Home() {
   const settings = useSettings()
@@ -40,6 +42,8 @@ export default function Home() {
       due,
       newAvailable,
       streak: streak(reviewDates, now),
+      doneToday: reviewDates.filter((d) => d >= dayStart(now)).length,
+      learned: cards.filter((c) => ['learned', 'known'].includes(wordStatus(c))).length,
       progress: levelProgress(cards, shown),
     }
   }, [])
@@ -50,48 +54,84 @@ export default function Home() {
   const total = today.due + today.newAvailable
 
   return (
-    <section className="py-8">
-      <h1 className="font-display text-5xl font-bold tracking-tight">
-        {total > 0 ? 'Bugün' : 'Bugünlük tamam'}
-      </h1>
-
-      <div className="mt-6 grid grid-cols-3 gap-3">
-        <Stat label="Tekrar" value={today.due} className="text-emerald-600 dark:text-emerald-400" />
-        <Stat label="Yeni" value={today.newAvailable} className="text-sky-600 dark:text-sky-400" />
-        <Stat
-          label="Seri"
-          value={today.streak}
-          suffix={today.streak > 0 ? '🔥' : undefined}
-          className="text-amber-600 dark:text-amber-400"
-        />
-      </div>
+    <section className="space-y-6 py-4">
+      <header>
+        <p className="eyebrow">{dateLine()}</p>
+        <h1 className="font-display mt-1 text-4xl font-bold tracking-tight sm:text-5xl">
+          {greeting()}
+        </h1>
+      </header>
 
       {total > 0 ? (
         <Link
           to="/calis"
-          className="mt-6 block rounded-2xl bg-zinc-900 py-4 text-center text-lg font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
+          className="group relative block overflow-hidden rounded-3xl bg-linear-to-br from-amber-300 via-amber-400 to-orange-500 p-6 text-zinc-950 shadow-xl shadow-amber-500/25 transition-transform duration-150 active:scale-[0.98]"
         >
-          Çalışmaya başla
+          {/* Arka planda dönük kart siluetleri (logodaki iki kart) */}
+          <span
+            aria-hidden
+            className="absolute -top-6 -right-6 h-36 w-28 rotate-12 rounded-2xl bg-white/25 transition-transform duration-300 group-hover:rotate-[18deg]"
+          />
+          <span
+            aria-hidden
+            className="absolute -top-2 right-10 h-36 w-28 -rotate-6 rounded-2xl bg-white/35 transition-transform duration-300 group-hover:-rotate-12"
+          />
+          <p className="relative text-sm font-semibold opacity-80">Bugünün oturumu</p>
+          <p className="font-display relative mt-1 text-3xl font-bold">
+            {total} kart seni bekliyor
+          </p>
+          <div className="relative mt-4 flex gap-2 text-sm font-semibold">
+            <span className="rounded-full bg-zinc-950/10 px-3 py-1">{today.due} tekrar</span>
+            <span className="rounded-full bg-zinc-950/10 px-3 py-1">{today.newAvailable} yeni</span>
+          </div>
+          <span className="relative mt-6 inline-flex items-center gap-2 rounded-2xl bg-zinc-950 px-5 py-3 font-semibold text-white transition-transform group-hover:translate-x-1">
+            Çalışmaya başla →
+          </span>
         </Link>
       ) : (
-        <p className="mt-6 rounded-2xl bg-zinc-100 p-4 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
-          Vadesi gelen kart yok ve günlük yeni kelime limitine ulaştın. Yarın görüşürüz!
-        </p>
+        <div className="surface p-6 text-center">
+          <SparkIcon className="animate-pop mx-auto size-10 text-amber-500" />
+          <p className="font-display mt-3 text-2xl font-bold">Bugünlük tamam</p>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            Vadesi gelen kart yok ve günlük yeni kelime limitine ulaştın. Yarın görüşürüz!
+          </p>
+        </div>
       )}
 
-      <section className="mt-10">
+      <div className="grid grid-cols-3 gap-3">
+        <Stat label="Bugün" value={today.doneToday} tone="text-sky-600 dark:text-sky-400" />
+        <Stat
+          label="Öğrenilen"
+          value={today.learned}
+          tone="text-emerald-600 dark:text-emerald-400"
+        />
+        <div className="surface p-4">
+          <p className="text-xs font-medium text-zinc-500">Seri</p>
+          <p className="mt-1 flex items-center gap-1 text-3xl font-bold text-amber-600 tabular-nums dark:text-amber-400">
+            {today.streak}
+            <FlameIcon
+              className={`size-6 ${today.streak > 0 ? 'animate-flame text-orange-500' : 'text-zinc-300 dark:text-zinc-700'}`}
+            />
+          </p>
+        </div>
+      </div>
+
+      <section className="surface p-5">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">İlerleme</h2>
-          <Link to="/istatistik" className="text-xs font-medium underline underline-offset-4">
-            İstatistikler
+          <h2 className="eyebrow">İlerleme</h2>
+          <Link
+            to="/istatistik"
+            className="text-xs font-medium text-zinc-500 underline-offset-4 hover:text-zinc-900 hover:underline dark:hover:text-zinc-100"
+          >
+            İstatistikler →
           </Link>
         </div>
-        <ul className="mt-3 space-y-3">
-          {today.progress.map((p) => (
-            <ProgressRow key={p.cefr} p={p} />
+        <ul className="mt-4 space-y-4">
+          {today.progress.map((p, i) => (
+            <ProgressRow key={p.cefr} p={p} delay={i * 80} />
           ))}
         </ul>
-        <p className="mt-3 flex gap-4 text-xs text-zinc-500">
+        <p className="mt-4 flex gap-4 text-xs text-zinc-500">
           <span className="flex items-center gap-1.5">
             <span className="size-2.5 rounded-full bg-emerald-500" /> öğrenildi / biliyorum
           </span>
@@ -101,25 +141,30 @@ export default function Home() {
         </p>
       </section>
 
-      <div className="mt-8 flex flex-wrap gap-4 text-sm font-medium">
-        <Link to="/eleme" className="underline underline-offset-4">
-          Hızlı eleme
-        </Link>
-        <Link to="/ekle" className="underline underline-offset-4">
-          Makaleden ekle
-        </Link>
-        <Link to="/kelimeler" className="underline underline-offset-4">
-          Kelimelere göz at
-        </Link>
-        <Link to="/baslangic" className="underline underline-offset-4">
-          Seviyeyi değiştir
-        </Link>
+      <div className="grid grid-cols-2 gap-3">
+        <QuickLink to="/eleme" title="Hızlı eleme" text="Bildiklerini kaydırarak ayıkla" />
+        <QuickLink to="/ekle" title="Makaleden ekle" text="Okuduğun metinden kelime al" />
+        <QuickLink to="/kelimeler" title="Kelimeler" text="Ara, filtrele, göz at" />
+        <QuickLink to="/baslangic" title="Seviyeyi değiştir" text="Çalışılan seviyeler" />
       </div>
     </section>
   )
 }
 
-function ProgressRow({ p }: { p: LevelProgress }) {
+/** Günün saatine göre selam (gece 04:00'e kadar "İyi geceler"; uygulamanın gün sınırıyla uyumlu). */
+function greeting(now = new Date()): string {
+  const h = now.getHours()
+  if (h < 4) return 'İyi geceler'
+  if (h < 12) return 'Günaydın'
+  if (h < 18) return 'İyi günler'
+  return 'İyi akşamlar'
+}
+
+function dateLine(now = new Date()): string {
+  return now.toLocaleDateString('tr', { weekday: 'long', day: 'numeric', month: 'long' })
+}
+
+function ProgressRow({ p, delay }: { p: LevelProgress; delay: number }) {
   const pct = (n: number) => (p.total ? (n / p.total) * 100 : 0)
   return (
     <li>
@@ -131,39 +176,50 @@ function ProgressRow({ p }: { p: LevelProgress }) {
           </span>
         </div>
         <div
-          className="mt-1.5 flex h-2.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
+          className="mt-2 flex h-2.5 overflow-hidden rounded-full bg-zinc-900/8 dark:bg-white/10"
           role="progressbar"
           aria-label={`${p.cefr} ilerlemesi`}
           aria-valuemin={0}
           aria-valuemax={p.total}
           aria-valuenow={p.done}
         >
-          <div className="bg-emerald-500" style={{ width: `${pct(p.done)}%` }} />
-          <div className="bg-amber-400" style={{ width: `${pct(p.learning)}%` }} />
+          {/* Açılışta soldan dolar */}
+          <div
+            className="animate-grow flex origin-left"
+            style={{ width: `${pct(p.done + p.learning)}%`, animationDelay: `${delay}ms` }}
+          >
+            <div
+              className="bg-emerald-500"
+              style={{ width: `${(p.done / Math.max(1, p.done + p.learning)) * 100}%` }}
+            />
+            <div className="flex-1 bg-amber-400" />
+          </div>
         </div>
       </Link>
     </li>
   )
 }
 
-function Stat({
-  label,
-  value,
-  suffix,
-  className,
-}: {
-  label: string
-  value: number
-  suffix?: string
-  className: string
-}) {
+function Stat({ label, value, tone }: { label: string; value: number; tone: string }) {
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-zinc-900">
-      <p className="text-sm text-zinc-500">{label}</p>
-      <p className={`mt-1 text-3xl font-bold tabular-nums sm:text-4xl ${className}`}>
-        {value}
-        {suffix && <span className="ml-1 text-xl">{suffix}</span>}
-      </p>
+    <div className="surface p-4">
+      <p className="text-xs font-medium text-zinc-500">{label}</p>
+      <p className={`mt-1 text-3xl font-bold tabular-nums ${tone}`}>{value}</p>
     </div>
+  )
+}
+
+function QuickLink({ to, title, text }: { to: string; title: string; text: string }) {
+  return (
+    <Link
+      to={to}
+      className="surface group block p-4 transition-transform duration-150 active:scale-[0.98]"
+    >
+      <p className="flex items-center justify-between font-semibold">
+        {title}
+        <span className="text-zinc-400 transition-transform group-hover:translate-x-0.5">→</span>
+      </p>
+      <p className="mt-0.5 text-xs text-zinc-500">{text}</p>
+    </Link>
   )
 }

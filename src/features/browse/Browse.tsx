@@ -83,7 +83,7 @@ export default function Browse() {
         onChange={(e) => update('q', e.target.value)}
         placeholder="İngilizce ya da Türkçe ara…"
         aria-label="Kelime ara"
-        className="mt-5 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-base outline-none focus:border-zinc-500 dark:border-zinc-800 dark:bg-zinc-900"
+        className="field mt-5 rounded-2xl px-4 py-3 text-base"
       />
 
       <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Seviye">
@@ -107,7 +107,7 @@ export default function Browse() {
           value={pos ?? ''}
           onChange={(e) => update('tur', e.target.value || undefined)}
           aria-label="Tür"
-          className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+          className="field"
         >
           <option value="">Tüm türler</option>
           {POS_OPTIONS.map((p) => (
@@ -120,7 +120,7 @@ export default function Browse() {
           value={status ?? ''}
           onChange={(e) => update('durum', e.target.value || undefined)}
           aria-label="Durum"
-          className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+          className="field"
         >
           <option value="">Tüm durumlar</option>
           {STATUS_OPTIONS.map((s) => (
@@ -148,12 +148,12 @@ export default function Browse() {
               </button>
             )}
           </p>
-          <ul className="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="surface mt-2 divide-y divide-zinc-900/5 overflow-hidden px-2 dark:divide-white/5">
             {results.slice(0, limit).map((w) => (
               <li key={w.id}>
                 <Link
                   to={`/kelime/${w.id}`}
-                  className="flex items-center gap-3 py-3 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/60"
+                  className="flex items-center gap-3 rounded-2xl px-2 py-3 transition-colors hover:bg-zinc-900/5 dark:hover:bg-white/5"
                 >
                   <CefrBadge level={w.cefr} className="w-9 text-center" />
                   <span className="min-w-0 flex-1">

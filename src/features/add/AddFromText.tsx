@@ -46,7 +46,7 @@ export default function AddFromText() {
             rows={6}
             placeholder="İngilizce bir paragraf yapıştır…"
             aria-label="Metin"
-            className="mt-5 w-full rounded-2xl border border-zinc-200 bg-white p-4 text-base leading-relaxed outline-none focus:border-zinc-500 dark:border-zinc-800 dark:bg-zinc-900"
+            className="field mt-5 rounded-2xl p-4 text-base leading-relaxed"
           />
           <button
             onClick={() => {
@@ -54,7 +54,7 @@ export default function AddFromText() {
               setEditing(false)
             }}
             disabled={tokens.length === 0}
-            className="mt-3 w-full rounded-2xl bg-zinc-900 py-3 font-semibold text-white disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
+            className="btn-primary mt-3 w-full py-3"
           >
             Kelime seç
           </button>
@@ -114,11 +114,7 @@ function TokenText({
     cursor = t.end
   })
   parts.push(text.slice(cursor))
-  return (
-    <div className="mt-5 rounded-2xl bg-white p-4 text-lg leading-loose whitespace-pre-wrap shadow-sm dark:bg-zinc-900">
-      {parts}
-    </div>
-  )
+  return <div className="surface mt-5 p-4 text-lg leading-loose whitespace-pre-wrap">{parts}</div>
 }
 
 /** Seçilen kelimeyi hazır veride ve kullanıcı kelimelerinde arar. */
@@ -154,7 +150,7 @@ function Lookup({ picked }: { picked: Picked }) {
           onChange={(e) => setTrSentence(e.target.value)}
           placeholder="Türkçesi (isteğe bağlı)"
           aria-label="Cümlenin Türkçesi"
-          className="mt-3 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className="field mt-3"
         />
       </div>
 
@@ -192,7 +188,7 @@ function Candidate({
   const card = useLiveQuery(() => db.cards.get(word.id), [word.id])
   const [done, setDone] = useState<string>()
   return (
-    <li className="rounded-2xl bg-white p-4 shadow-sm dark:bg-zinc-900">
+    <li className="surface p-4">
       <div className="flex items-center gap-2">
         <CefrBadge level={word.cefr} />
         <Link to={`/kelime/${word.id}`} className="font-semibold hover:underline">
@@ -220,7 +216,7 @@ function Candidate({
                 : 'Cümle bu kelimenin örneklerine eklendi.',
             )
           }}
-          className="mt-3 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
+          className="btn-primary mt-3 px-4 py-2 text-sm"
         >
           Bu cümleyle çalışmaya ekle
         </button>
@@ -263,12 +259,11 @@ function CustomWordForm({
     }
   }, [phrase])
 
-  const input =
-    'w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900'
+  const input = 'field'
 
   return (
     <form
-      className="mt-4 space-y-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-zinc-900"
+      className="surface mt-4 space-y-3 p-4"
       onSubmit={async (e) => {
         e.preventDefault()
         const word = makeCustomWord({
@@ -328,10 +323,7 @@ function CustomWordForm({
         aria-label="İngilizce tanım"
         className={input}
       />
-      <button
-        type="submit"
-        className="w-full rounded-xl bg-zinc-900 py-2.5 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
-      >
+      <button type="submit" className="btn-primary w-full py-2.5 text-sm">
         Kelimeyi ekle ve çalışmaya al
       </button>
       <p className="text-[11px] text-zinc-400">

@@ -1,6 +1,7 @@
-import { motion, type PanInfo } from 'motion/react'
+import { AnimatePresence, motion, type PanInfo } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
+import { CloseIcon } from '../../components/icons'
 import { Loading } from '../../components/Loading'
 import { db, type Settings } from '../../db/db'
 import { useSettings } from '../../db/hooks'
@@ -110,6 +111,7 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
   const [current, setCurrent] = useState<QueueItem | undefined>(() => nextItem(session, startedAt))
   const [flipped, setFlipped] = useState(false)
   const [intervals, setIntervals] = useState<Record<Grade, string>>()
+  const [exitDir, setExitDir] = useState(1)
   const busy = useRef(false)
 
   const word = current ? words.get(current.wordId) : undefined
@@ -136,6 +138,7 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
       if (!current || !word || !flipped || busy.current) return
       busy.current = true
       try {
+        setExitDir(EXIT_DIR[g])
         const now = new Date()
         const updated = await rateWord(db, word, g, now)
         const next = answer(session, current, g, updated.due, now)
@@ -169,6 +172,8 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
   }
 
   const c = counts(session)
+  const remaining = c.new + c.learning + c.review
+  const progress = session.answered.length / Math.max(1, session.answered.length + remaining)
 
   function onDragEnd(_: unknown, info: PanInfo) {
     if (!flipped) return
@@ -178,50 +183,93 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
 
   return (
     <section className="flex min-h-[calc(100dvh-5rem)] flex-col pb-4">
-      <div className="flex items-center justify-between py-2 text-sm tabular-nums">
-        <Link to="/" className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
-          ← Bitir
+      <div className="flex items-center gap-3 py-2">
+        <Link
+          to="/"
+          aria-label="Oturumu bitir"
+          className="btn-ghost size-10 shrink-0 rounded-full p-0"
+        >
+          <CloseIcon className="size-5" />
         </Link>
-        <span className="flex gap-3 font-semibold">
-          <span className="text-sky-600 dark:text-sky-400" title="Yeni">
-            {c.new}
-          </span>
-          <span className="text-rose-600 dark:text-rose-400" title="Öğreniliyor">
-            {c.learning}
-          </span>
-          <span className="text-emerald-600 dark:text-emerald-400" title="Tekrar">
-            {c.review}
-          </span>
+        {/* Oturum ilerlemesi (yeniden öğrenilen kartlar eklendikçe hedef de büyür) */}
+        <div
+          className="h-2 flex-1 overflow-hidden rounded-full bg-zinc-900/8 dark:bg-white/10"
+          role="progressbar"
+          aria-label="Oturum ilerlemesi"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress * 100)}
+        >
+          <div
+            className="h-full rounded-full bg-linear-to-r from-amber-300 to-orange-500 transition-[width] duration-500 ease-out"
+            style={{ width: `${Math.max(3, progress * 100)}%` }}
+          />
+        </div>
+        <span className="flex gap-1.5 text-xs font-semibold tabular-nums">
+          <Count n={c.new} title="Yeni" className="bg-sky-500/15 text-sky-700 dark:text-sky-300" />
+          <Count
+            n={c.learning}
+            title="Öğreniliyor"
+            className="bg-rose-500/15 text-rose-700 dark:text-rose-300"
+          />
+          <Count
+            n={c.review}
+            title="Tekrar"
+            className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+          />
         </span>
       </div>
 
-      <motion.div
-        key={current.wordId + session.answered.length}
-        drag={flipped ? 'x' : false}
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.6}
-        onDragEnd={onDragEnd}
-        className="mt-2 flex-1 touch-pan-y"
-      >
-        <StudyCard
-          word={word}
-          kind={current.kind}
-          example={example}
-          flipped={flipped}
-          onFlip={flip}
-          direction={settings.direction}
-        />
-      </motion.div>
+      <div className="relative mt-3 flex-1">
+        <AnimatePresence mode="popLayout" initial={false} custom={exitDir}>
+          <motion.div
+            key={current.wordId + session.answered.length}
+            custom={exitDir}
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
+            }}
+            exit="exit"
+            variants={{
+              // Puan yönüne göre çıkış: Tekrar sola, İyi/Kolay sağa, Zor yukarı
+              exit: (dir: number) => ({
+                x: dir * 320,
+                y: dir === 0 ? -40 : 0,
+                rotate: dir * 8,
+                opacity: 0,
+                transition: { duration: 0.22, ease: 'easeIn' },
+              }),
+            }}
+            drag={flipped ? 'x' : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.6}
+            onDragEnd={onDragEnd}
+            className="touch-pan-y"
+          >
+            <StudyCard
+              word={word}
+              kind={current.kind}
+              example={example}
+              flipped={flipped}
+              onFlip={flip}
+              direction={settings.direction}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Başparmak erişimi için butonlar altta, kaydırırken görünür kalır */}
-      <div className="sticky bottom-0 mt-4 bg-zinc-50/90 pt-3 pb-1 backdrop-blur dark:bg-zinc-950/90">
+      <div className="sticky bottom-0 mt-4 pt-3 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
         {flipped ? (
           <div className="grid grid-cols-4 gap-2">
             {GRADES.map((g) => (
               <button
                 key={g}
                 onClick={() => void grade(g)}
-                className={`flex flex-col items-center rounded-2xl py-3 font-semibold ${GRADE_STYLES[g]}`}
+                className={`flex flex-col items-center rounded-2xl py-3 font-semibold ring-1 backdrop-blur-xl transition-transform duration-150 active:scale-95 ${GRADE_STYLES[g]}`}
               >
                 <span>{GRADE_LABELS[g]}</span>
                 <span className="text-xs font-normal opacity-75">{intervals?.[g]}</span>
@@ -230,10 +278,7 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
             ))}
           </div>
         ) : (
-          <button
-            onClick={flip}
-            className="w-full rounded-2xl bg-zinc-900 py-4 font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
-          >
+          <button onClick={flip} className="btn-primary w-full py-4 text-base">
             Cevabı göster
           </button>
         )}
@@ -242,9 +287,25 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
   )
 }
 
+function Count({ n, title, className }: { n: number; title: string; className: string }) {
+  return (
+    <span title={title} className={`min-w-7 rounded-full px-2 py-0.5 text-center ${className}`}>
+      {n}
+    </span>
+  )
+}
+
 const GRADE_STYLES: Record<Grade, string> = {
-  [Rating.Again]: 'bg-rose-500/15 text-rose-700 dark:text-rose-300',
-  [Rating.Hard]: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
-  [Rating.Good]: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
-  [Rating.Easy]: 'bg-sky-500/15 text-sky-700 dark:text-sky-300',
+  [Rating.Again]: 'bg-rose-500/15 text-rose-700 ring-rose-500/20 dark:text-rose-300',
+  [Rating.Hard]: 'bg-amber-500/15 text-amber-700 ring-amber-500/20 dark:text-amber-300',
+  [Rating.Good]: 'bg-emerald-500/15 text-emerald-700 ring-emerald-500/20 dark:text-emerald-300',
+  [Rating.Easy]: 'bg-sky-500/15 text-sky-700 ring-sky-500/20 dark:text-sky-300',
+}
+
+/** Puanın kartı fırlattığı yön: Tekrar sola (-1), Zor yukarı (0), İyi/Kolay sağa (1) */
+const EXIT_DIR: Record<Grade, number> = {
+  [Rating.Again]: -1,
+  [Rating.Hard]: 0,
+  [Rating.Good]: 1,
+  [Rating.Easy]: 1,
 }
