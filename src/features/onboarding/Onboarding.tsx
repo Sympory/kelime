@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { CefrBadge } from '../../components/CefrBadge'
 import { db } from '../../db/db'
 import { saveSettings } from '../../db/settings'
+import { requestPersistence } from '../../lib/storage'
 import { levelsFrom, LEVELS } from '../../data/words'
 import type { Cefr } from '../../types/word'
 
@@ -21,6 +22,8 @@ export default function Onboarding() {
 
   async function start(placement: boolean) {
     if (!level) return
+    // Kullanıcı dokunuşuyla birlikte: tarayıcıdan ilerlemeyi silmemesini iste (sonucu beklenmez)
+    void requestPersistence()
     await saveSettings(db, { levels: levelsFrom(level), placementDone: !placement })
     navigate(placement ? '/eleme' : '/')
   }

@@ -7,6 +7,7 @@ import { db, type Settings } from '../../db/db'
 import { useSettings } from '../../db/hooks'
 import { saveSettings } from '../../db/settings'
 import { speak, speechSupported } from '../../lib/speech'
+import { usePersistence } from '../../lib/storage'
 import { dayKey } from '../../srs/day'
 import { importWordList, parseWordList, type ImportSummary } from './wordList'
 
@@ -130,9 +131,11 @@ function SettingsForm({ settings }: { settings: Settings }) {
 
       <Group title="Veri">
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          İlerlemen yalnızca bu tarayıcıda saklanır. Başka bir cihaza taşımak için yedeği indirip
-          orada geri yükle.
+          İlerlemen yalnızca bu tarayıcıda saklanır (hesap yok). Aynı cihaz ve tarayıcıdan
+          girdiğinde kaldığın yerden devam edersin. Başka bir cihaza taşımak için yedeği indirip
+          orada geri yükle; ara sıra yedek almak da iyi bir fikir.
         </p>
+        <PersistenceRow />
         <div className="flex flex-wrap gap-2">
           <Button onClick={onExport}>Yedeği indir (JSON)</Button>
           <Button onClick={() => fileInput.current?.click()}>Yedekten geri yükle</Button>
@@ -167,6 +170,40 @@ function SettingsForm({ settings }: { settings: Settings }) {
         </div>
       </Group>
     </section>
+  )
+}
+
+/** Tarayıcının veriyi kendiliğinden silmemesi için kalıcı depolama durumu ve isteği */
+function PersistenceRow() {
+  const [state, request] = usePersistence()
+  const [asked, setAsked] = useState(false)
+  if (!state.supported || state.persisted === undefined) return null
+  return state.persisted ? (
+    <p className="flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400">
+      <span aria-hidden>✓</span> Tarayıcı bu verileri kendiliğinden silmeyecek (kalıcı depolama
+      açık).
+    </p>
+  ) : (
+    <div className="space-y-2 rounded-2xl bg-amber-400/10 p-3 text-sm">
+      <p>
+        Tarayıcı, yer darlığında ya da uzun süre kullanılmadığında verileri silebilir. Korumak için
+        izin iste; telefonda siteyi <strong>ana ekrana eklemek</strong> de korumayı güçlendirir.
+      </p>
+      <Button
+        onClick={async () => {
+          await request()
+          setAsked(true)
+        }}
+      >
+        Verilerimi silinmeye karşı koru
+      </Button>
+      {asked && (
+        <p role="status" className="text-xs text-zinc-600 dark:text-zinc-400">
+          Tarayıcı şimdilik izin vermedi. Chrome bu izni site düzenli kullanıldığında ya da ana
+          ekrana eklendiğinde kendiliğinden verir. O zamana kadar ara sıra yedek almanı öneririz.
+        </p>
+      )}
+    </div>
   )
 }
 
