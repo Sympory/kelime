@@ -47,8 +47,12 @@ export function StudyCard({ word, kind, example, flipped, onFlip, direction = 'e
             rotateY: flipped ? 90 : -90,
             transition: { duration: HALF_FLIP_S, ease: 'easeIn' },
           }}
-          onClick={flipped ? undefined : onFlip}
-          className={`surface relative overflow-hidden p-6 sm:p-8 ${flipped ? '' : 'cursor-pointer'}`}
+          onClick={(e) => {
+            // Seslendirme düğmesi ve Tatoeba bağlantısı kartı çevirmesin
+            if ((e.target as HTMLElement).closest('a, button')) return
+            onFlip()
+          }}
+          className="surface relative cursor-pointer overflow-hidden p-6 sm:p-8"
         >
           {/* Üstte seviye renginde ince şerit */}
           <span
@@ -151,6 +155,11 @@ function Back({ word, example }: { word: Word; example?: Example }) {
           </ul>
         </section>
       )}
+
+      <p className="mt-6 text-center text-xs text-zinc-400">
+        Ön yüze dönmek için karta dokun{' '}
+        <kbd className="ml-1 hidden rounded border px-1 text-[10px] sm:inline">Boşluk</kbd>
+      </p>
     </div>
   )
 }
