@@ -13,6 +13,8 @@ function hash(s: string): number {
  * hep "a…" ile başlayan kelimeleri getirirdi; kimliğe göre kararlı bir karıştırma kullanılır.
  * Seviyeler korunur: düşük seviyedeki kelimeler önce gelir.
  */
-export function newWordOrder<T extends { id: string; cefr: string }>(words: T[]): T[] {
-  return [...words].sort((a, b) => a.cefr.localeCompare(b.cefr) || hash(a.id) - hash(b.id))
+export function newWordOrder<T extends { id: string; cefr?: string }>(words: T[]): T[] {
+  return [...words].sort(
+    (a, b) => (a.cefr ?? 'Z').localeCompare(b.cefr ?? 'Z') || hash(a.id) - hash(b.id),
+  )
 }

@@ -8,6 +8,7 @@ import { StatusPill } from '../../components/StatusPill'
 import { db } from '../../db/db'
 import { useSettings } from '../../db/hooks'
 import { LEVELS, useWords } from '../../data/words'
+import { useUserData } from '../../db/userWords'
 import { STATUS_LABELS, wordStatus, type WordStatus } from '../../srs/stats'
 import type { Cefr, Pos } from '../../types/word'
 import { filterWords } from './filter'
@@ -31,6 +32,7 @@ export default function Browse() {
     : settings && (settings.levels.length ? settings.levels : LEVELS)
 
   const words = useWords(levels)
+  const user = useUserData()
   const cardList = useLiveQuery(() => db.cards.toArray(), [])
   const cards = useMemo(() => new Map((cardList ?? []).map((c) => [c.wordId, c])), [cardList])
   const deferredQuery = useDeferredValue(query)
@@ -38,9 +40,17 @@ export default function Browse() {
   const results = useMemo(
     () =>
       words.status === 'ready'
-        ? filterWords(words.list, cards, { query: deferredQuery, pos, status })
+        ? filterWords(
+            // Kendi eklenen kelimeler: seviyesi yoksa her zaman, varsa seçili seviyedeyse
+            [
+              ...(user?.words ?? []).filter((w) => !w.cefr || levels?.includes(w.cefr)),
+              ...words.list,
+            ],
+            cards,
+            { query: deferredQuery, pos, status },
+          )
         : [],
-    [words, cards, deferredQuery, pos, status],
+    [words, user, levels, cards, deferredQuery, pos, status],
   )
 
   function update(key: string, value: string | undefined) {

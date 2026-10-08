@@ -13,11 +13,30 @@
   --color-cefr-c2: #7c3aed;
 }
 
-/* Koyu tema öncelikli; açık tema sistem tercihiyle */
-:root {
-  color-scheme: dark light;
-}
+/* Tema <html class="dark"> ile seçilir (ayarlar: sistem / açık / koyu); bkz. src/lib/theme.ts */
+@custom-variant dark (&:where(.dark, .dark *));
 
 body {
   @apply min-h-dvh bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+}
+
+/*
+ * Grafik renkleri (dataviz doğrulayıcısından geçti): tek tonlu mavi sıralı ölçek.
+ * Koyu modda kendi adımları: çok değer daha açık renk; en soluk adım zemine karşı ≥ 2:1.
+ */
+:root {
+  --chart-empty: #e4e4e7;
+  --chart-seq-1: #86b6ef;
+  --chart-seq-2: #3987e5;
+  --chart-seq-3: #1c5cab;
+  --chart-seq-4: #0d366b;
+  --chart-bar: #2a78d6;
+}
+.dark {
+  --chart-empty: #27272a;
+  --chart-seq-1: #184f95;
+  --chart-seq-2: #2a78d6;
+  --chart-seq-3: #6da7ec;
+  --chart-seq-4: #b7d3f6;
+  --chart-bar: #3987e5;
 }

@@ -29,3 +29,6 @@ scripts/.cache/
 
 # Geçici iskelet klasörü
 tmp-scaffold/
+
+# PWA geliştirme çıktısı
+dev-dist/

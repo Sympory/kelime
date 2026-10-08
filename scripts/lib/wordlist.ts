@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import type { Cefr, Pos } from '../../src/types/word.ts'
-import { parseCsv } from './csv.ts'
+import { parseCsv } from '../../src/lib/csv.ts'
 import { ensureDownloaded } from './download.ts'
 
 export type BaseWord = {

@@ -26,7 +26,7 @@ export default function Home() {
     const poolSize = index.levels
       .filter((l) => s.levels.includes(l.cefr))
       .reduce((sum, l) => sum + l.count, 0)
-    const seenInPool = cards.filter((c) => s.levels.includes(c.cefr)).length
+    const seenInPool = cards.filter((c) => c.cefr && s.levels.includes(c.cefr)).length
     const queuedNew = active.filter((c) => c.state === State.New).length
     const newAvailable = Math.min(
       Math.max(0, s.dailyNewLimit - introduced),
@@ -80,7 +80,12 @@ export default function Home() {
       )}
 
       <section className="mt-10">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">İlerleme</h2>
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">İlerleme</h2>
+          <Link to="/istatistik" className="text-xs font-medium underline underline-offset-4">
+            İstatistikler
+          </Link>
+        </div>
         <ul className="mt-3 space-y-3">
           {today.progress.map((p) => (
             <ProgressRow key={p.cefr} p={p} />
@@ -99,6 +104,9 @@ export default function Home() {
       <div className="mt-8 flex flex-wrap gap-4 text-sm font-medium">
         <Link to="/eleme" className="underline underline-offset-4">
           Hızlı eleme
+        </Link>
+        <Link to="/ekle" className="underline underline-offset-4">
+          Makaleden ekle
         </Link>
         <Link to="/kelimeler" className="underline underline-offset-4">
           Kelimelere göz at

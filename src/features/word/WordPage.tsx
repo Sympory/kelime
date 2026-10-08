@@ -10,6 +10,7 @@ import { db } from '../../db/db'
 import { useSettings } from '../../db/hooks'
 import { placeWord } from '../../db/repo'
 import { findWord } from '../../data/words'
+import { deleteUserWord, useUserData, withUserExamples } from '../../db/userWords'
 import { State } from '../../srs/scheduler'
 import { wordStatus } from '../../srs/stats'
 import type { Word } from '../../types/word'
@@ -22,7 +23,9 @@ export default function WordPage() {
   useEffect(() => {
     if (!settings) return
     let cancelled = false
-    void findWord(id, settings.levels).then((w) => !cancelled && setWord(w ?? null))
+    // Kullanıcı kelimeleri (u-…) kendi tablosunda, hazır veri seviye dosyalarında
+    const find = id.startsWith('u-') ? db.userWords.get(id) : findWord(id, settings.levels)
+    void find.then((w) => !cancelled && setWord(w ?? null))
     return () => {
       cancelled = true
     }
@@ -41,8 +44,10 @@ export default function WordPage() {
   return <WordDetail word={word} />
 }
 
-function WordDetail({ word }: { word: Word }) {
+function WordDetail({ word: base }: { word: Word }) {
   const navigate = useNavigate()
+  const user = useUserData()
+  const word = withUserExamples(base, user)
   const card = useLiveQuery(() => db.cards.get(word.id), [word.id])
   const status = wordStatus(card)
   const fmt = (d: Date) =>
@@ -132,6 +137,18 @@ function WordDetail({ word }: { word: Word }) {
               className="rounded-xl px-4 py-2 text-sm font-semibold text-zinc-600 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-800"
             >
               Biliyorum olarak işaretle
+            </button>
+          )}
+          {word.custom && (
+            <button
+              onClick={async () => {
+                if (!confirm(`"${word.lemma}" ve tüm ilerlemesi silinsin mi?`)) return
+                await deleteUserWord(db, word.id)
+                navigate('/kelimeler', { replace: true })
+              }}
+              className="rounded-xl px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-500/10 dark:text-rose-400"
+            >
+              Kelimeyi sil
             </button>
           )}
         </div>

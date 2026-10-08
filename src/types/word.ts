@@ -19,7 +19,10 @@ export type Word = {
   id: string // "deteriorate-v"
   lemma: string // "deteriorate"
   pos: Pos
-  cefr: Cefr
+  /** Hazır veride her zaman dolu; kullanıcının eklediği kelimelerde bilinmeyebilir */
+  cefr?: Cefr
+  /** Kullanıcının makaleden ya da CSV'den eklediği, hazır veride olmayan kelime */
+  custom?: true
   ipa?: string
   defEn: string[] // kısa İngilizce tanımlar (en fazla 2)
   tr: string[] // Türkçe karşılıklar
@@ -36,3 +39,6 @@ export type DataIndex = {
   generatedAt: string
   levels: { cefr: Cefr; file: string; count: number }[]
 }
+
+/** public/data/lookup.json — küçük harfli yazılış → ["kelime-kimliği|SEVİYE", …] */
+export type DataLookup = Record<string, string[]>
