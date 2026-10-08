@@ -4,7 +4,16 @@ import { Highlighted } from '../../components/Highlighted'
 import { POS_LABELS } from '../../components/pos'
 import { ExampleView, Meaning, Relations, WordHeading } from '../../components/WordParts'
 import type { QueueKind } from '../../srs/queue'
-import type { Example, Word } from '../../types/word'
+import type { Cefr, Example, Word } from '../../types/word'
+
+const STRIPE: Record<Cefr, string> = {
+  A1: 'bg-cefr-a1',
+  A2: 'bg-cefr-a2',
+  B1: 'bg-cefr-b1',
+  B2: 'bg-cefr-b2',
+  C1: 'bg-cefr-c1',
+  C2: 'bg-cefr-c2',
+}
 
 const KIND_LABELS: Record<QueueKind, { label: string; className: string }> = {
   new: { label: 'Yeni', className: 'text-sky-600 dark:text-sky-400' },
@@ -39,10 +48,13 @@ export function StudyCard({ word, kind, example, flipped, onFlip, direction = 'e
             transition: { duration: HALF_FLIP_S, ease: 'easeIn' },
           }}
           onClick={flipped ? undefined : onFlip}
-          className={`rounded-3xl bg-white p-6 shadow-xl shadow-zinc-900/10 sm:p-8 dark:bg-zinc-900 dark:shadow-black/40 ${
-            flipped ? '' : 'cursor-pointer'
-          }`}
+          className={`surface relative overflow-hidden p-6 sm:p-8 ${flipped ? '' : 'cursor-pointer'}`}
         >
+          {/* Üstte seviye renginde ince şerit */}
+          <span
+            aria-hidden
+            className={`absolute inset-x-0 top-0 h-1 ${word.cefr ? STRIPE[word.cefr] : 'bg-zinc-400'}`}
+          />
           <header className="flex items-center gap-2 text-xs font-semibold">
             <CefrBadge level={word.cefr} />
             <span className={KIND_LABELS[kind].className}>{KIND_LABELS[kind].label}</span>
@@ -65,7 +77,7 @@ export function StudyCard({ word, kind, example, flipped, onFlip, direction = 'e
 function FrontReverse({ word, example }: { word: Word; example?: Example }) {
   const hint = word.tr.length ? word.tr.join(', ') : word.defEn[0]
   return (
-    <div className="flex min-h-56 flex-col justify-center py-6">
+    <div className="flex min-h-64 flex-col justify-center py-8">
       <p className="font-display text-center text-3xl font-bold text-amber-700 sm:text-4xl dark:text-amber-300">
         {hint}
       </p>
@@ -94,15 +106,15 @@ function FrontReverse({ word, example }: { word: Word; example?: Example }) {
 
 function Front({ word, example }: { word: Word; example?: Example }) {
   return (
-    <div className="flex min-h-56 flex-col justify-center py-6">
+    <div className="flex min-h-64 flex-col justify-center py-8">
       {example ? (
-        <p className="font-display text-2xl leading-snug sm:text-3xl">
+        <p className="font-display text-[1.7rem] leading-snug text-balance sm:text-3xl">
           <Highlighted text={example.en} hl={example.hl} />
         </p>
       ) : (
         <p className="font-display text-center text-5xl font-bold tracking-tight">{word.lemma}</p>
       )}
-      <p className="mt-8 text-center text-sm text-zinc-400">
+      <p className="mt-10 text-center text-sm text-zinc-400">
         Anlamını düşün, sonra çevir{' '}
         <kbd className="ml-1 hidden rounded border px-1 text-xs sm:inline">Boşluk</kbd>
       </p>
@@ -118,7 +130,7 @@ function Back({ word, example }: { word: Word; example?: Example }) {
       <Meaning word={word} />
 
       {example && (
-        <div className="mt-5 border-l-2 border-amber-400 pl-3">
+        <div className="mt-5 rounded-2xl border-l-4 border-amber-400 bg-amber-400/10 p-3">
           <ExampleView example={example} />
         </div>
       )}

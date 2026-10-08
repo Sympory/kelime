@@ -242,9 +242,7 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-8">
       <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">{title}</h2>
-      <div className="mt-3 space-y-4 rounded-2xl bg-white p-5 shadow-sm dark:bg-zinc-900">
-        {children}
-      </div>
+      <div className="surface mt-3 space-y-4 p-5">{children}</div>
     </section>
   )
 }
@@ -271,7 +269,7 @@ function Segmented<T extends string>({
   options: { value: T; label: string }[]
 }) {
   return (
-    <div role="radiogroup" className="inline-flex rounded-xl bg-zinc-100 p-1 dark:bg-zinc-800">
+    <div role="radiogroup" className="inline-flex rounded-xl bg-zinc-900/5 p-1 dark:bg-white/10">
       {options.map((o) => (
         <button
           key={o.value}
@@ -306,7 +304,7 @@ function Stepper({
 }) {
   const clamp = (v: number) => Math.min(max, Math.max(min, v))
   return (
-    <div className="inline-flex items-center rounded-xl bg-zinc-100 p-1 dark:bg-zinc-800">
+    <div className="inline-flex items-center rounded-xl bg-zinc-900/5 p-1 dark:bg-white/10">
       <button
         aria-label="Azalt"
         onClick={() => onChange(clamp(value - step))}
@@ -332,7 +330,7 @@ function Button({ onClick, children }: { onClick: () => void; children: ReactNod
   return (
     <button
       onClick={onClick}
-      className="rounded-xl bg-zinc-100 px-4 py-2 text-sm font-semibold hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+      className="btn-ghost bg-zinc-900/5 px-4 py-2 text-sm dark:bg-white/10"
     >
       {children}
     </button>

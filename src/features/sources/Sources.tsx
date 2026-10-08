@@ -61,7 +61,7 @@ export default function Sources() {
         bir bütün olarak CC BY-SA 4.0 ile dağıtılır.
       </p>
 
-      <ul className="mt-8 divide-y divide-zinc-200 dark:divide-zinc-800">
+      <ul className="mt-8 divide-y divide-zinc-900/5 dark:divide-white/5">
         {sources.map((s) => (
           <li key={s.name} className="py-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">

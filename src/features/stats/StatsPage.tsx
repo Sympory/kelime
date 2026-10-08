@@ -67,7 +67,7 @@ export default function StatsPage() {
 
 function Tile({ label, value, unit }: { label: string; value: number | string; unit: string }) {
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-zinc-900">
+    <div className="surface p-4">
       <dt className="text-xs text-zinc-500">{label}</dt>
       <dd className="mt-1 text-3xl font-bold tabular-nums">{value}</dd>
       <dd className="text-xs text-zinc-500">{unit}</dd>
@@ -102,7 +102,7 @@ function ChartCard({
   table: { head: [string, string]; rows: [string, number][] }
 }) {
   return (
-    <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm dark:bg-zinc-900">
+    <section className="surface mt-8 p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="font-semibold">{title}</h2>
         <p className="text-xs text-zinc-500">{summary}</p>

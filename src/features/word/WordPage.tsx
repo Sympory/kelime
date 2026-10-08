@@ -13,7 +13,16 @@ import { findWord } from '../../data/words'
 import { deleteUserWord, useUserData, withUserExamples } from '../../db/userWords'
 import { State } from '../../srs/scheduler'
 import { wordStatus } from '../../srs/stats'
-import type { Word } from '../../types/word'
+import type { Cefr, Word } from '../../types/word'
+
+const STRIPE: Record<Cefr, string> = {
+  A1: 'bg-cefr-a1',
+  A2: 'bg-cefr-a2',
+  B1: 'bg-cefr-b1',
+  B2: 'bg-cefr-b2',
+  C1: 'bg-cefr-c1',
+  C2: 'bg-cefr-c2',
+}
 
 export default function WordPage() {
   const { id = '' } = useParams()
@@ -62,17 +71,24 @@ function WordDetail({ word: base }: { word: Word }) {
         ← Geri
       </button>
 
-      <header className="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold">
-        <CefrBadge level={word.cefr} />
-        <span className="text-zinc-500">{POS_LABELS[word.pos]}</span>
-        <span className="ml-auto">
-          <StatusPill status={status} />
-        </span>
-      </header>
+      <div className="surface relative mt-4 overflow-hidden p-6">
+        {/* Üstte seviye renginde ince şerit (çalışma kartıyla aynı) */}
+        <span
+          aria-hidden
+          className={`absolute inset-x-0 top-0 h-1 ${word.cefr ? STRIPE[word.cefr] : 'bg-zinc-400'}`}
+        />
+        <header className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+          <CefrBadge level={word.cefr} />
+          <span className="text-zinc-500">{POS_LABELS[word.pos]}</span>
+          <span className="ml-auto">
+            <StatusPill status={status} />
+          </span>
+        </header>
 
-      <div className="mt-3">
-        <WordHeading word={word} as="h1" />
-        <Meaning word={word} />
+        <div className="mt-3">
+          <WordHeading word={word} as="h1" />
+          <Meaning word={word} />
+        </div>
       </div>
 
       {word.examples.length > 0 && (
@@ -90,7 +106,7 @@ function WordDetail({ word: base }: { word: Word }) {
 
       <Relations word={word} />
 
-      <section className="mt-8 rounded-2xl bg-zinc-100 p-5 dark:bg-zinc-900">
+      <section className="surface mt-8 p-5">
         {card && card.status === 'active' && card.state !== State.New ? (
           <dl className="grid grid-cols-3 gap-3 text-sm">
             <div>
@@ -119,7 +135,7 @@ function WordDetail({ word: base }: { word: Word }) {
           {(status === 'known' || !card) && (
             <button
               onClick={() => placeWord(db, word, false, new Date())}
-              className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
+              className="btn-primary px-4 py-2 text-sm"
             >
               Çalışmaya ekle
             </button>

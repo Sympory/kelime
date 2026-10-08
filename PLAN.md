@@ -155,10 +155,11 @@ kelime/
   - **4b** ✅ Makaleden ekle, kullanıcı kelimeleri, CSV liste içe aktarma. Tanım önerisi için dictionaryapi.dev yerine Datamuse kullanıldı (dictionaryapi.dev denemede çoğu kelimede yanıt vermedi; Datamuse kök hâli de veriyor).
   - **4c** ✅ İstatistik sayfası: bugün, doğru oranı, seri, öğrenilen; son 30 gün ısı haritası ve önümüzdeki 7 günün yükü (dataviz palet doğrulayıcısından geçen tek tonlu mavi ölçek, tablo görünümü).
 
-**Faz 5 — Görsel tasarım** _(ilk kullanıcı geri bildirimiyle eklendi: "mekanikler iyi, görsel olarak yetersiz")_
+**Faz 5 — Görsel tasarım** ✅ _(ilk kullanıcı geri bildirimiyle eklendi: "mekanikler iyi, görsel olarak yetersiz")_
 - Mekanikler oturduktan sonra tüm ekranlar için tutarlı bir görsel dil: arka plan (doku/degrade, seviyeye göre renk vurgusu), kart tasarımı, tipografi ölçeği, ikonlar.
 - Anlamlı animasyonlar: kart çevirme ve kaydırma geri bildirimi, sayfa geçişleri, ilerleme çubuğu ve seri kutlamaları, oturum sonu ekranı. Hepsi kısa (≤ 300 ms) ve `prefers-reduced-motion`'a saygılı.
 - Boş/yükleniyor durumları (iskelet ekranlar), mobilde başparmak erişimi gözden geçirmesi.
+- _Yapılan:_ ortak tasarım sınıfları (`surface` buzlu cam yüzey, `btn-primary`/`btn-brand`/`btn-ghost`, `field`, `chip`, `eyebrow`); marka renkleri logodan (amber + mor); sıcak kırık beyaz / mürekkep zemin, köşelerde ışık haleleri ve ince doku; telefonda alt sekme çubuğu (ortada öne çıkan Ekle), masaüstünde hap menü; sayfa geçişi, ilerleme çubuğu dolması, puan yönüne göre kart çıkışı, kaydırma renklenmesi, seri alevi, oturum sonu konfeti ve doğru oranı halkası; iskelet yükleniyor ekranı. Animasyon kütüphanesi ana pakete girmedi (geçişler CSS).
 
 **Faz 6 — Açık kaynak cilası**
 - CONTRIBUTING.md (veri düzeltme nasıl yapılır, PR akışı), issue/PR şablonları, "good first issue" etiketleri.
