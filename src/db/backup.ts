@@ -7,7 +7,7 @@ import {
   type Settings,
   type UserExample,
 } from './db'
-import { getSettings } from './repo'
+import { getSettings } from './settings'
 
 /**
  * Yedek dosyası biçimi. Alan eklenirse sürümü artırıp `importBackup` içinde eski sürümü dönüştürün.

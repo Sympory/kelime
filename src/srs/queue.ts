@@ -1,6 +1,7 @@
 import type { Cefr } from '../types/word'
 import { dayEnd } from './day'
-import { State, type Card } from './scheduler'
+import type { Card } from './scheduler'
+import { State } from './state'
 
 /** IndexedDB'deki kart kaydı: ts-fsrs kartı + kelime bilgisi. `due` indekslidir. */
 export type StoredCard = Card & {

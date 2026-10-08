@@ -1,28 +1,10 @@
-import { dayStart } from '../srs/day'
 import type { StoredCard } from '../srs/queue'
-import { newCard, rate, State, type Grade } from '../srs/scheduler'
+import { newCard, rate, type Grade } from '../srs/scheduler'
 import type { Cefr } from '../types/word'
-import { DEFAULT_SETTINGS, type KelimeDB, type Settings } from './db'
+import type { KelimeDB } from './db'
 
-export async function getSettings(db: KelimeDB): Promise<Settings> {
-  const rows = await db.settings.toArray()
-  return { ...DEFAULT_SETTINGS, ...Object.fromEntries(rows.map((r) => [r.key, r.value])) }
-}
-
-export async function saveSettings(db: KelimeDB, patch: Partial<Settings>): Promise<void> {
-  await db.settings.bulkPut(
-    Object.entries(patch).map(([key, value]) => ({ key: key as keyof Settings, value })),
-  )
-}
-
-/** Bugün ilk kez değerlendirilen (yeni → öğreniliyor) kart sayısı; günlük yeni limiti için. */
-export async function countIntroducedToday(db: KelimeDB, now: Date): Promise<number> {
-  return db.reviews
-    .where('review')
-    .aboveOrEqual(dayStart(now))
-    .filter((r) => r.state === State.New)
-    .count()
-}
+// Ayar ve sorgu fonksiyonları hafif modülde (ts-fsrs'siz); eski içe aktarmalar için yeniden dışa aktarılır
+export { countIntroducedToday, getSettings, saveSettings } from './settings'
 
 function stored(
   wordId: string,

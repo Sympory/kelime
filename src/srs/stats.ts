@@ -1,7 +1,7 @@
 import type { Cefr } from '../types/word'
 import { dayKey } from './day'
 import type { StoredCard } from './queue'
-import { State } from './scheduler'
+import { State } from './state'
 
 /** Bir kartın tekrar aralığı bu kadar güne ulaşınca kelime "öğrenildi" sayılır (Anki'deki "olgun"). */
 export const MATURE_DAYS = 21
