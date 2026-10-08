@@ -4,12 +4,18 @@ Açık kaynak, tamamen ücretsiz İngilizce kelime kartı uygulaması. B1 → B2
 
 **Canlı:** https://kelime-pink.vercel.app/
 
-## Özellikler (planlanan)
+## Özellikler
 
-- FSRS algoritmasıyla aralıklı tekrar (`ts-fsrs`)
-- Her kelimede CEFR seviyesi, İngilizce tanım, Türkçe karşılık, örnek cümleler, collocation'lar, eş anlamlılar, kelime ailesi
-- Hesap yok: ilerleme tarayıcıda (IndexedDB) tutulur, JSON ile dışa/içe aktarılır
-- Telefonda ana ekrana eklenebilir, internetsiz çalışır (PWA)
+- **Aralıklı tekrar:** FSRS algoritması (`ts-fsrs`); günlük kuyruk, Tekrar / Zor / İyi / Kolay, telefonda kaydırma, klavye kısayolları
+- **9.723 kelime (A1–C2):** CEFR seviyesi, İngilizce tanım, IPA, Türkçe karşılık, Tatoeba örnek cümleleri (Türkçe çevirili), collocation'lar, eş anlamlılar, kelime ailesi
+- **Kart ön yüzünde cümle içinde kelime**, her tekrarda farklı örnek; isteğe bağlı Türkçe → İngilizce yönü
+- **Hızlı eleme:** bildiğin kelimeleri kaydırarak ayıkla, yalnızca bilmediklerini çalış
+- **Makaleden ekle:** okuduğun metinde kelimeye dokun; cümle o kelimenin kartına eklenir, listede yoksa kendi kelimen olur
+- **Kendi listen:** CSV ile kelime listesi içe aktar (ör. Oxford 5000; yalnızca tarayıcında kalır)
+- **İstatistik:** seri, doğru oranı, son 30 gün ısı haritası, önümüzdeki 7 günün yükü
+- **Telaffuz:** tarayıcının sesli okuması (Amerikan / İngiliz aksanı)
+- **Hesap yok:** ilerleme tarayıcıda (IndexedDB) tutulur, JSON yedeği ile cihazlar arası taşınır
+- **Telefona kurulabilir, internetsiz çalışır** (PWA); açık / koyu tema
 
 Ayrıntılı yol haritası için [PLAN.md](PLAN.md).
 
@@ -50,9 +56,13 @@ Hat şu adımları izler (`scripts/`):
 
 Ham dosyalar `data/raw/`, önbellekler `scripts/.cache/` altına iner (ikisi de git dışı).
 
-### Katkı: Türkçe karşılık ve örnek düzeltmeleri
+## Katkı
 
-Kod bilmeden katkı vermenin en kolay yolu: [`data/overrides/`](data/overrides/README.md).
+Katkılar çok değerli — özellikle **Türkçe karşılık düzeltmeleri**, ki bunun için kod bilmek gerekmez. Ayrıntılar: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+- Uygulamada "otomatik" etiketli Türkçe karşılıklar gözden geçirilmeyi bekliyor ([liste](data/report.md)).
+- Başlangıç için: [`good first issue`](https://github.com/Sympory/kelime/labels/good%20first%20issue).
+- Hata ya da öneri: [issue aç](https://github.com/Sympory/kelime/issues/new/choose).
 
 ## Lisans
 
