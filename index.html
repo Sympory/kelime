@@ -8,8 +8,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b0b10" />
     <meta name="description" content="Açık kaynak, ücretsiz İngilizce kelime kartı uygulaması" />
-    <!-- Fontlar önceden yüklenmez: font-display: swap ile metin beklemeden çizilir; yavaş bağlantıda
-         ön yükleme uygulama JS'iyle yarışıp ilk çizimi geciktiriyordu (Lighthouse ölçümü, Faz 6). -->
+    <!-- Gövde fontu (latin + Türkçe karakterler için latin-ext) ve başlık fontu: CSS beklenmeden insin -->
+    <link
+      rel="preload"
+      href="/fonts/inter-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/inter-latin-ext-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/fraunces-latin-opsz-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <title>Kelime</title>
     <script>
       // Sayfa çizilmeden temayı uygula (beyaz parlama olmasın); ayrıntı: src/lib/theme.ts
