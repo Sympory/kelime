@@ -1,5 +1,5 @@
 /* Kendi sunucumuzdan fontlar: Inter ve Fraunces (SIL OFL 1.1, Fontsource derlemesi; lisanslar public/fonts/).
-   Yalnızca latin + latin-ext (Türkçe karakterler dahil). Sabit adlı oldukları için index.html önceden yükler.
+   Yalnızca latin + latin-ext (Türkçe karakterler dahil). Sabit adlıdırlar (gerekirse index.html önceden yükleyebilir).
    Google Fonts yerine: sayfa çizimini bekletmez, ek bağlantı gerektirmez, çevrimdışı da çalışır. */
 
 /* inter-latin-ext-wght-normal */
