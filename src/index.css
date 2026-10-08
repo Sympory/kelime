@@ -92,7 +92,7 @@ body {
 }
 
 @utility eyebrow {
-  @apply text-xs font-semibold tracking-[0.12em] text-zinc-500 uppercase;
+  @apply text-xs font-semibold tracking-[0.12em] text-zinc-600 uppercase dark:text-zinc-400;
 }
 
 /* Hareket azaltma tercihi: tüm geçiş ve animasyonları neredeyse sıfıra indir */
