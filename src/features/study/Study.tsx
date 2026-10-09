@@ -18,6 +18,7 @@ import {
   Rating,
   type Grade,
 } from '../../srs/scheduler'
+import { playFeedback } from '../../lib/feedback'
 import { answer, counts, nextItem, startSession, type Session } from '../../srs/session'
 import type { Cefr, Word } from '../../types/word'
 import { StudyCard } from './StudyCard'
@@ -115,6 +116,9 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
   const [showBack, setShowBack] = useState(false)
   const [intervals, setIntervals] = useState<Record<Grade, string>>()
   const [exitDir, setExitDir] = useState(1)
+  // Üst üste doğru cevap serisi; 5'in katlarında kısa bir kutlama gösterilir
+  const [combo, setCombo] = useState(0)
+  const [cheer, setCheer] = useState<number>()
   const busy = useRef(false)
 
   const word = current ? words.get(current.wordId) : undefined
@@ -148,6 +152,12 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
       busy.current = true
       try {
         setExitDir(EXIT_DIR[g])
+        const nextCombo = g === Rating.Again ? 0 : combo + 1
+        setCombo(nextCombo)
+        const milestone = nextCombo > 0 && nextCombo % COMBO_STEP === 0
+        if (milestone) setCheer(nextCombo)
+        if (settings.feedback)
+          playFeedback(g === Rating.Again ? 'again' : milestone ? 'combo' : 'correct')
         const now = new Date()
         const updated = await rateWord(db, word, g, now)
         const next = answer(session, current, g, updated.due, now)
@@ -160,8 +170,14 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
         busy.current = false
       }
     },
-    [current, word, revealed, session],
+    [current, word, revealed, session, combo, settings.feedback],
   )
+
+  useEffect(() => {
+    if (cheer === undefined) return
+    const t = setTimeout(() => setCheer(undefined), 1600)
+    return () => clearTimeout(t)
+  }, [cheer])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -216,21 +232,38 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
           />
         </div>
         <span className="flex gap-1.5 text-xs font-semibold tabular-nums">
-          <Count n={c.new} title="Yeni" className="bg-sky-500/15 text-sky-700 dark:text-sky-300" />
+          <Count n={c.new} label="yeni" className="bg-sky-500/15 text-sky-700 dark:text-sky-300" />
           <Count
             n={c.learning}
+            label="öğren."
             title="Öğreniliyor"
             className="bg-rose-500/15 text-rose-700 dark:text-rose-300"
           />
           <Count
             n={c.review}
-            title="Tekrar"
+            label="tekrar"
             className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
           />
         </span>
       </div>
 
       <div className="relative mt-3 flex-1">
+        <AnimatePresence>
+          {cheer !== undefined && (
+            <motion.div
+              key={cheer}
+              role="status"
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="pointer-events-none absolute inset-x-0 -top-1 z-10 flex justify-center"
+            >
+              <span className="rounded-full bg-linear-to-r from-amber-400 to-orange-500 px-4 py-1.5 text-sm font-bold text-zinc-950 shadow-lg shadow-orange-500/30">
+                🔥 {cheer} doğru üst üste!
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <AnimatePresence mode="popLayout" initial={false} custom={exitDir}>
           <motion.div
             key={current.wordId + session.answered.length}
@@ -297,13 +330,29 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
   )
 }
 
-function Count({ n, title, className }: { n: number; title: string; className: string }) {
+function Count({
+  n,
+  label,
+  title = label,
+  className,
+}: {
+  n: number
+  label: string
+  title?: string
+  className: string
+}) {
   return (
-    <span title={title} className={`min-w-7 rounded-full px-2 py-0.5 text-center ${className}`}>
-      {n}
+    <span
+      title={title}
+      className={`flex min-w-9 flex-col items-center rounded-xl px-2 py-0.5 leading-tight ${className}`}
+    >
+      <span>{n}</span>
+      <span className="text-[9px] font-medium opacity-80">{label}</span>
     </span>
   )
 }
+
+const COMBO_STEP = 5
 
 const GRADE_STYLES: Record<Grade, string> = {
   [Rating.Again]: 'bg-rose-500/15 text-rose-700 ring-rose-500/20 dark:text-rose-300',
