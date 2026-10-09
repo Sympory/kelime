@@ -75,20 +75,27 @@ function PlacementDeck({ words, seen }: { words: Word[]; seen: Set<string> }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [decide])
 
-  const total = stats.known + stats.unknown
+  // İlerleme tüm havuz üzerinden gösterilir: önceki oturumlarda elenenler de sayılır
+  const before = words.length - deck.length
+  const done = before + stats.known + stats.unknown
 
   return (
     <section className="flex min-h-[calc(100dvh-5rem)] flex-col pb-4">
       <div className="flex items-baseline justify-between pt-2">
         <h1 className="font-display text-2xl font-bold">Hızlı eleme</h1>
         <span className="text-sm text-zinc-500 tabular-nums">
-          {total} / {deck.length}
+          {done} / {words.length}
         </span>
       </div>
       <p className="mt-1 text-sm text-zinc-500">
         Biliyorsan sağa, bilmiyorsan sola kaydır. Klavyede → / ←, anlam için boşluk.{' '}
         {PLACEMENT_GOAL} bilinmeyen kelime toplayınca çalışmaya dönebilirsin.
       </p>
+      {before > 0 && (
+        <p className="mt-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+          Kaldığın yerden devam ediyorsun: {before} kelimeyi daha önce elemiştin.
+        </p>
+      )}
 
       <div className="relative mt-6 flex flex-1 items-center justify-center">
         <AnimatePresence mode="popLayout" custom={exitDir}>
