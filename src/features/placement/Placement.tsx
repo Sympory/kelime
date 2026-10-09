@@ -14,6 +14,8 @@ import { newWordOrder } from '../../srs/order'
 import type { Word } from '../../types/word'
 
 const SWIPE_PX = 100
+/** Bu kadar bilinmeyen kelime toplanınca çalışmaya dönmek önerilir (binlerce kelimeyi elemek yorucu) */
+export const PLACEMENT_GOAL = 30
 
 export default function Placement() {
   const settings = useSettings()
@@ -35,7 +37,10 @@ function PlacementDeck({ words, seen }: { words: Word[]; seen: Set<string> }) {
   const [stats, setStats] = useState({ known: 0, unknown: 0 })
   const [exitDir, setExitDir] = useState(0)
   const [showMeaning, setShowMeaning] = useState(false)
-  const current = deck[index]
+  // Bu sayıya ulaşınca hedef ekranı çıkar; "Elemeye devam" bir sonraki hedefi açar
+  const [goal, setGoal] = useState(PLACEMENT_GOAL)
+  const goalReached = stats.unknown >= goal
+  const current = goalReached ? undefined : deck[index]
 
   const decide = useCallback(
     (known: boolean) => {
@@ -49,10 +54,13 @@ function PlacementDeck({ words, seen }: { words: Word[]; seen: Set<string> }) {
     [current],
   )
 
-  const finish = useCallback(async () => {
-    await saveSettings(db, { placementDone: true })
-    navigate('/')
-  }, [navigate])
+  const finish = useCallback(
+    async (to = '/') => {
+      await saveSettings(db, { placementDone: true })
+      navigate(to)
+    },
+    [navigate],
+  )
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -67,23 +75,57 @@ function PlacementDeck({ words, seen }: { words: Word[]; seen: Set<string> }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [decide])
 
-  const total = stats.known + stats.unknown
+  // İlerleme tüm havuz üzerinden gösterilir: önceki oturumlarda elenenler de sayılır
+  const before = words.length - deck.length
+  const done = before + stats.known + stats.unknown
 
   return (
     <section className="flex min-h-[calc(100dvh-5rem)] flex-col pb-4">
       <div className="flex items-baseline justify-between pt-2">
         <h1 className="font-display text-2xl font-bold">Hızlı eleme</h1>
         <span className="text-sm text-zinc-500 tabular-nums">
-          {total} / {deck.length}
+          {done} / {words.length}
         </span>
       </div>
       <p className="mt-1 text-sm text-zinc-500">
-        Biliyorsan sağa, bilmiyorsan sola kaydır. Klavyede → / ←, anlam için boşluk.
+        Biliyorsan sağa, bilmiyorsan sola kaydır. Klavyede → / ←, anlam için boşluk.{' '}
+        {PLACEMENT_GOAL} bilinmeyen kelime toplayınca çalışmaya dönebilirsin.
       </p>
+      {before > 0 && (
+        <p className="mt-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+          Kaldığın yerden devam ediyorsun: {before} kelimeyi daha önce elemiştin.
+        </p>
+      )}
 
       <div className="relative mt-6 flex flex-1 items-center justify-center">
         <AnimatePresence mode="popLayout" custom={exitDir}>
-          {current ? (
+          {goalReached ? (
+            <motion.div
+              key="goal"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="surface w-full max-w-sm p-6 text-center"
+              role="status"
+            >
+              <p className="text-4xl">🎯</p>
+              <h2 className="font-display mt-3 text-2xl font-bold">Yeterli kelime eklendi</h2>
+              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                {stats.unknown} bilinmeyen kelime çalışma listene girdi. Artık çalışmaya
+                dönebilirsin; elemeye istediğin zaman kaldığın yerden devam edersin.
+              </p>
+              <div className="mt-5 flex flex-col gap-2">
+                <button onClick={() => finish('/calis')} className="btn-brand">
+                  Çalışmaya başla
+                </button>
+                <button
+                  onClick={() => setGoal((g) => g + PLACEMENT_GOAL)}
+                  className="btn-ghost px-5 py-3"
+                >
+                  Elemeye devam et
+                </button>
+              </div>
+            </motion.div>
+          ) : current ? (
             <SwipeCard
               key={current.id}
               word={current}
@@ -125,9 +167,11 @@ function PlacementDeck({ words, seen }: { words: Word[]; seen: Set<string> }) {
         <span className="text-zinc-500">
           <span className="text-emerald-600 dark:text-emerald-400">{stats.known} biliyorum</span>
           {' · '}
-          <span className="text-rose-600 dark:text-rose-400">{stats.unknown} çalışılacak</span>
+          <span className="text-rose-600 dark:text-rose-400">
+            {stats.unknown} / {goal} çalışılacak
+          </span>
         </span>
-        <button onClick={finish} className="font-semibold underline underline-offset-4">
+        <button onClick={() => finish()} className="font-semibold underline underline-offset-4">
           Bitir
         </button>
       </div>

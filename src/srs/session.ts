@@ -43,9 +43,9 @@ export function answer(
 }
 
 /** Ekrandaki sayaçlar: yeni / öğreniliyor / tekrar */
-export function counts(s: Session): Record<QueueItem['kind'], number> {
+export function counts(s: Session): Record<'new' | 'learning' | 'review', number> {
   const c = { new: 0, learning: s.learning.length, review: 0 }
-  for (const q of s.queue) c[q.kind]++
+  for (const q of s.queue) c[q.kind === 'reinforce' ? 'review' : q.kind]++
   return c
 }
 

@@ -1,5 +1,5 @@
 import type { Cefr } from '../types/word'
-import { dayEnd } from './day'
+import { dayEnd, dayStart } from './day'
 import type { Card } from './scheduler'
 import { State } from './state'
 
@@ -13,7 +13,8 @@ export type StoredCard = Card & {
   addedAt: Date
 }
 
-export type QueueKind = 'learning' | 'review' | 'new'
+/** reinforce: vakti gelmemiş ama unutulmaya en yakın eski kelime (pekiştirme) */
+export type QueueKind = 'learning' | 'review' | 'new' | 'reinforce'
 export type QueueItem = { wordId: string; kind: QueueKind; due: Date }
 
 /** Öğrenme adımındaki kartlar bu kadar erken gösterilebilir (Anki'deki "learn ahead"). */
@@ -40,6 +41,38 @@ export type BuildQueueInput = {
   newLimit: number
   /** Bugün ilk kez değerlendirilen yeni kart sayısı */
   introducedToday: number
+  /** Oturuma karıştırılacak en fazla pekiştirme kartı sayısı (varsayılan 0) */
+  reinforce?: number
+}
+
+/**
+ * Unutulma riski: son tekrardan geçen gün / kararlılık (stability). FSRS'de hatırlama olasılığı
+ * bu oranla monoton düşer; sıralama için kütüphaneye gerek yok (ana sayfa onu indirmesin diye).
+ */
+function forgettingRisk(c: Card, now: Date): number {
+  if (!c.last_review || c.stability <= 0) return 0
+  const days = (now.getTime() - c.last_review.getTime()) / 86_400_000
+  return days / c.stability
+}
+
+/**
+ * Pekiştirme adayları: öğrenilmiş (tekrar aşamasında), bugün vadesi gelmeyen ve bugün hiç
+ * görülmemiş kartlardan unutulmaya en yakın olanlar.
+ */
+export function reinforcementCandidates(cards: StoredCard[], now: Date, max: number): StoredCard[] {
+  if (max <= 0) return []
+  const today = dayStart(now)
+  return cards
+    .filter(
+      (c) =>
+        c.status === 'active' &&
+        c.state === State.Review &&
+        !isDueReview(c, now) &&
+        c.last_review !== undefined &&
+        c.last_review < today,
+    )
+    .sort((a, b) => forgettingRisk(b, now) - forgettingRisk(a, now))
+    .slice(0, max)
 }
 
 /**
@@ -52,6 +85,7 @@ export function buildQueue({
   now,
   newLimit,
   introducedToday,
+  reinforce = 0,
 }: BuildQueueInput): QueueItem[] {
   const active = cards.filter((c) => c.status === 'active')
   const byDue = (a: { due: Date }, b: { due: Date }) => a.due.getTime() - b.due.getTime()
@@ -67,9 +101,22 @@ export function buildQueue({
   const unseen = poolIds.filter((id) => !seen.has(id))
   const newIds = [...queuedNew, ...unseen].slice(0, Math.max(0, newLimit - introducedToday))
 
+  // Yeni kelimelerin arasına eski kelimeler serpiştirilir: her iki yeniden sonra bir pekiştirme
+  const fresh: QueueItem[] = newIds.map((wordId) => ({ wordId, kind: 'new' as const, due: now }))
+  const old: QueueItem[] = reinforcementCandidates(cards, now, reinforce).map((c) => ({
+    wordId: c.wordId,
+    kind: 'reinforce' as const,
+    due: now,
+  }))
+  const mixed: QueueItem[] = []
+  while (fresh.length || old.length) {
+    mixed.push(...fresh.splice(0, 2))
+    if (old.length) mixed.push(old.shift()!)
+  }
+
   return [
     ...learning.map((c) => ({ wordId: c.wordId, kind: 'learning' as const, due: c.due })),
     ...reviews.map((c) => ({ wordId: c.wordId, kind: 'review' as const, due: c.due })),
-    ...newIds.map((wordId) => ({ wordId, kind: 'new' as const, due: now })),
+    ...mixed,
   ]
 }

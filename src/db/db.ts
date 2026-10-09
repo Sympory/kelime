@@ -12,6 +12,8 @@ export type Settings = {
   /** Çalışılan seviyeler; boşsa kullanıcı henüz başlangıç ekranını tamamlamamıştır */
   levels: Cefr[]
   dailyNewLimit: number
+  /** Her oturuma yeni kelimelerin arasında karışan, vakti gelmemiş eski kelime sayısı */
+  reinforceLimit: number
   placementDone: boolean
   /** Telaffuz aksanı (Web Speech API dil kodu) */
   accent: 'en-US' | 'en-GB'
@@ -23,6 +25,7 @@ export type Settings = {
 export const DEFAULT_SETTINGS: Settings = {
   levels: [],
   dailyNewLimit: 10,
+  reinforceLimit: 5,
   placementDone: false,
   accent: 'en-US',
   direction: 'en-tr',

@@ -69,6 +69,18 @@ function SettingsForm({ settings }: { settings: Settings }) {
             />
           </div>
         </Row>
+        <Row
+          label="Pekiştirme"
+          hint="Her oturumda yeni kelimelerin arasına, unutmaya en yakın bu kadar eski kelime karışır"
+        >
+          <Stepper
+            value={settings.reinforceLimit}
+            onChange={(v) => set({ reinforceLimit: v })}
+            min={0}
+            max={20}
+            step={5}
+          />
+        </Row>
         <Row label="Kart yönü">
           <Segmented
             value={settings.direction}
