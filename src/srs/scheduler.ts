@@ -24,8 +24,8 @@ export const GRADE_LABELS: Record<Grade, string> = {
 
 const scheduler = fsrs(
   generatorParameters({
-    request_retention: 0.9,
-    maximum_interval: 365 * 3,
+    request_retention: 0.92,
+    maximum_interval: 365,
     enable_fuzz: true, // aynı gün eklenen kartlar aynı güne yığılmasın
     enable_short_term: true,
     learning_steps: ['1m', '10m'],

@@ -19,6 +19,7 @@ const KIND_LABELS: Record<QueueKind, { label: string; className: string }> = {
   new: { label: 'Yeni', className: 'text-sky-600 dark:text-sky-400' },
   learning: { label: 'Öğreniliyor', className: 'text-rose-600 dark:text-rose-400' },
   review: { label: 'Tekrar', className: 'text-emerald-600 dark:text-emerald-400' },
+  reinforce: { label: 'Pekiştirme', className: 'text-violet-600 dark:text-violet-400' },
 }
 
 /** Yarım çevirme süresi; toplam animasyon 2 × 120 ms (plan: ≤ 300 ms). */

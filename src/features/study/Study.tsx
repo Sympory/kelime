@@ -105,6 +105,7 @@ function StudySession({ settings, words, pool, cards, introducedToday, startedAt
       now: startedAt,
       newLimit: settings.dailyNewLimit,
       introducedToday,
+      reinforce: settings.reinforceLimit,
     }).filter((item) => words.has(item.wordId)) // veri güncellemesinde kaldırılmış kelimeler
     return startSession(queue)
   })

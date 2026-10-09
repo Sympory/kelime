@@ -94,6 +94,52 @@ describe('buildQueue', () => {
     })
     expect(q.map((i) => i.wordId)).toEqual(['soon'])
   })
+
+  it('pekiştirme: vakti gelmemiş eski kelimeler unutulma riskine göre yenilerin arasına karışır', () => {
+    const day = 86_400_000
+    const old = (id: string, daysAgo: number, stability: number, patch: Partial<StoredCard> = {}) =>
+      card(id, {
+        state: State.Review,
+        stability,
+        last_review: new Date(now.getTime() - daysAgo * day),
+        due: new Date(now.getTime() + 10 * day),
+        ...patch,
+      })
+    const q = buildQueue({
+      ...base,
+      newLimit: 4,
+      reinforce: 2,
+      cards: [
+        old('safe', 1, 50), // risk 0.02
+        old('risky', 9, 10), // risk 0.9
+        old('mid', 5, 10), // risk 0.5
+        old('today', 30, 10, { last_review: now }), // bugün görüldü → aday değil
+        old('known', 30, 10, { status: 'known' }),
+      ],
+      poolIds: ['n1', 'n2', 'n3', 'n4'],
+    })
+    expect(q.map((i) => `${i.kind}:${i.wordId}`)).toEqual([
+      'new:n1',
+      'new:n2',
+      'reinforce:risky',
+      'new:n3',
+      'new:n4',
+      'reinforce:mid',
+    ])
+  })
+
+  it('pekiştirme varsayılan olarak kapalı; yeni kelime yoksa da eskiler gelir', () => {
+    const c = card('r', {
+      state: State.Review,
+      stability: 5,
+      last_review: new Date(now.getTime() - 3 * 86_400_000),
+      due: new Date(now.getTime() + 5 * 86_400_000),
+    })
+    expect(buildQueue({ ...base, cards: [c], poolIds: [] })).toEqual([])
+    expect(
+      buildQueue({ ...base, cards: [c], poolIds: [], reinforce: 3 }).map((i) => i.kind),
+    ).toEqual(['reinforce'])
+  })
 })
 
 describe('oturum', () => {

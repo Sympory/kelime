@@ -24,6 +24,7 @@ describe('repo', () => {
     expect(await getSettings(db)).toEqual({
       levels: [],
       dailyNewLimit: 10,
+      reinforceLimit: 5,
       placementDone: false,
       accent: 'en-US',
       direction: 'en-tr',
@@ -33,6 +34,7 @@ describe('repo', () => {
     expect(await getSettings(db)).toEqual({
       levels: ['B1', 'B2'],
       dailyNewLimit: 15,
+      reinforceLimit: 5,
       placementDone: false,
       accent: 'en-US',
       direction: 'en-tr',
