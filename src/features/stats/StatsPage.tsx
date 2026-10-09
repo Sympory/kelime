@@ -1,5 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { SparkIcon } from '../../components/icons'
 import { Loading } from '../../components/Loading'
 import { db } from '../../db/db'
 import { accuracy, dailyCounts, forecast, streak, wordStatus, type DayCount } from '../../srs/stats'
@@ -38,6 +40,7 @@ export default function StatsPage() {
   }, [])
 
   if (!data) return <Loading />
+  if (data.total === 0) return <EmptyStats />
 
   return (
     <section className="py-6">
@@ -248,5 +251,25 @@ function Forecast({ days }: { days: DayCount[] }) {
         ))}
       </div>
     </ChartCard>
+  )
+}
+
+/** Hiç tekrar yokken sıfırlarla dolu tablolar yerine ne göreceğini anlatan karşılama */
+function EmptyStats() {
+  return (
+    <section className="py-6">
+      <h1 className="font-display text-3xl font-bold">İstatistik</h1>
+      <div className="surface animate-page-in mt-6 p-8 text-center">
+        <SparkIcon className="animate-pop mx-auto size-12 text-amber-500" />
+        <p className="font-display mt-4 text-2xl font-bold">Burası ilk oturumunla dolacak</p>
+        <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-600 dark:text-zinc-400">
+          Çalıştıkça günlük serin, doğru oranın, öğrendiğin kelimeler ve önümüzdeki günlerin
+          tekrarları burada görünür.
+        </p>
+        <Link to="/calis" className="btn-brand mt-6">
+          İlk oturuma başla
+        </Link>
+      </div>
+    </section>
   )
 }

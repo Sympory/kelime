@@ -20,6 +20,8 @@ export type Settings = {
   /** en-tr: cümledeki kelimeyi tanı (varsayılan) · tr-en: Türkçeden İngilizceyi hatırla */
   direction: 'en-tr' | 'tr-en'
   theme: 'system' | 'light' | 'dark'
+  /** Puan verince kısa ses ve titreşim */
+  feedback: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -30,6 +32,7 @@ export const DEFAULT_SETTINGS: Settings = {
   accent: 'en-US',
   direction: 'en-tr',
   theme: 'system',
+  feedback: true,
 }
 
 type SettingRow = { key: keyof Settings; value: Settings[keyof Settings] }

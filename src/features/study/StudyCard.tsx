@@ -82,7 +82,7 @@ export function StudyCard({ word, kind, example, flipped, onFlip, direction = 'e
 function FrontReverse({ word, example }: { word: Word; example?: Example }) {
   const hint = word.tr.length ? word.tr.join(', ') : word.defEn[0]
   return (
-    <div className="flex min-h-64 flex-col justify-center py-8">
+    <div className={FRONT_CLASS}>
       <p className="font-display text-center text-3xl font-bold text-amber-700 sm:text-4xl dark:text-amber-300">
         {hint}
       </p>
@@ -109,11 +109,14 @@ function FrontReverse({ word, example }: { word: Word; example?: Example }) {
   )
 }
 
+/** Ön yüz ekranın büyük kısmını kaplar; cümle ortada durur, başparmak düğmeye kısa yoldan gider */
+const FRONT_CLASS = 'flex min-h-[clamp(16rem,52dvh,30rem)] flex-col justify-center py-8'
+
 function Front({ word, example }: { word: Word; example?: Example }) {
   return (
-    <div className="flex min-h-64 flex-col justify-center py-8">
+    <div className={FRONT_CLASS}>
       {example ? (
-        <p className="font-display text-[1.7rem] leading-snug text-balance sm:text-3xl">
+        <p className="font-display text-[1.8rem] leading-snug text-balance sm:text-[2.1rem]">
           <Highlighted text={example.en} hl={example.hl} />
         </p>
       ) : (

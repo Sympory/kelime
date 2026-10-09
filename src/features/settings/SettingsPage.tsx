@@ -81,6 +81,19 @@ function SettingsForm({ settings }: { settings: Settings }) {
             step={5}
           />
         </Row>
+        <Row
+          label="Ses ve titreşim"
+          hint="Puan verince kısa bir ses ve (destekleyen telefonlarda) titreşim"
+        >
+          <Segmented
+            value={settings.feedback ? 'on' : 'off'}
+            onChange={(v) => set({ feedback: v === 'on' })}
+            options={[
+              { value: 'on', label: 'Açık' },
+              { value: 'off', label: 'Kapalı' },
+            ]}
+          />
+        </Row>
         <Row label="Kart yönü">
           <Segmented
             value={settings.direction}

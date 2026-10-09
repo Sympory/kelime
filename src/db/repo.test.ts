@@ -29,6 +29,7 @@ describe('repo', () => {
       accent: 'en-US',
       direction: 'en-tr',
       theme: 'system',
+      feedback: true,
     })
     await saveSettings(db, { levels: ['B1', 'B2'], dailyNewLimit: 15 })
     expect(await getSettings(db)).toEqual({
@@ -39,6 +40,7 @@ describe('repo', () => {
       accent: 'en-US',
       direction: 'en-tr',
       theme: 'system',
+      feedback: true,
     })
   })
 
