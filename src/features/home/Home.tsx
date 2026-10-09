@@ -10,7 +10,15 @@ import { loadIndex } from '../../data/words'
 import { isDueLearning, isDueReview } from '../../srs/queue'
 import { State } from '../../srs/state'
 import { dayStart } from '../../srs/day'
-import { levelProgress, streak, wordStatus, type LevelProgress } from '../../srs/stats'
+import {
+  dailyCounts,
+  forecast,
+  levelProgress,
+  streak,
+  wordStatus,
+  type DayCount,
+  type LevelProgress,
+} from '../../srs/stats'
 
 export default function Home() {
   const settings = useSettings()
@@ -42,6 +50,8 @@ export default function Home() {
       due,
       newAvailable,
       streak: streak(reviewDates, now),
+      week: dailyCounts(reviewDates, now, 7),
+      tomorrow: forecast(cards, now, 2)[1].count,
       doneToday: reviewDates.filter((d) => d >= dayStart(now)).length,
       learned: cards.filter((c) => ['learned', 'known'].includes(wordStatus(c))).length,
       progress: levelProgress(cards, shown),
@@ -93,8 +103,19 @@ export default function Home() {
           <SparkIcon className="animate-pop mx-auto size-10 text-amber-500" />
           <p className="font-display mt-3 text-2xl font-bold">Bugünlük tamam</p>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Vadesi gelen kart yok ve günlük yeni kelime limitine ulaştın. Yarın görüşürüz!
+            Vadesi gelen kart yok ve günlük yeni kelime limitine ulaştın.
           </p>
+          <p className="mt-4 inline-flex rounded-full bg-amber-400/15 px-3 py-1 text-sm font-medium text-amber-800 dark:text-amber-300">
+            {today.tomorrow > 0
+              ? `Yarın ${today.tomorrow} tekrar seni bekliyor`
+              : 'Yarın yeni kelimelerle görüşürüz'}
+          </p>
+          <Link
+            to="/eleme"
+            className="mt-4 block text-sm font-medium text-zinc-500 underline underline-offset-4 hover:text-zinc-900 dark:hover:text-zinc-100"
+          >
+            Daha fazla kelime için hızlı elemeye devam et
+          </Link>
         </div>
       )}
 
@@ -115,6 +136,8 @@ export default function Home() {
           </p>
         </div>
       </div>
+
+      <WeekStrip days={today.week} />
 
       <section className="surface p-5">
         <div className="flex items-baseline justify-between">
@@ -221,5 +244,44 @@ function QuickLink({ to, title, text }: { to: string; title: string; text: strin
       </p>
       <p className="mt-0.5 text-xs text-zinc-500">{text}</p>
     </Link>
+  )
+}
+
+/** Son 7 gün: çalışılan günler dolu daire, bugün halkalı (seriyi gözle görmek için) */
+function WeekStrip({ days }: { days: DayCount[] }) {
+  const active = days.filter((d) => d.count > 0).length
+  return (
+    <section className="surface p-5">
+      <div className="flex items-baseline justify-between">
+        <h2 className="eyebrow">Bu hafta</h2>
+        <span className="text-xs text-zinc-500">{active} / 7 gün çalışıldı</span>
+      </div>
+      <ol className="mt-4 grid grid-cols-7 gap-1 text-center">
+        {days.map((d, i) => {
+          const isToday = i === days.length - 1
+          const done = d.count > 0
+          return (
+            <li key={d.key} className="flex flex-col items-center gap-1.5">
+              <span
+                title={`${d.date.toLocaleDateString('tr', { day: 'numeric', month: 'long' })}: ${d.count} tekrar`}
+                className={`flex size-9 items-center justify-center rounded-full text-sm font-bold ${
+                  done
+                    ? 'animate-pop bg-linear-to-br from-amber-300 to-orange-500 text-zinc-950 shadow-md shadow-orange-500/25'
+                    : 'bg-zinc-900/5 text-zinc-400 dark:bg-white/5'
+                } ${isToday ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950' : ''}`}
+                style={done ? { animationDelay: `${i * 50}ms` } : undefined}
+              >
+                {done ? '✓' : ''}
+              </span>
+              <span
+                className={`text-[11px] ${isToday ? 'font-semibold text-zinc-900 dark:text-zinc-100' : 'text-zinc-500'}`}
+              >
+                {d.date.toLocaleDateString('tr', { weekday: 'short' }).slice(0, 3)}
+              </span>
+            </li>
+          )
+        })}
+      </ol>
+    </section>
   )
 }
