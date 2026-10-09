@@ -1,6 +1,9 @@
+import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { SparkIcon } from '../../components/icons'
+import { FlameIcon, SparkIcon } from '../../components/icons'
+import { db } from '../../db/db'
+import { forecast, streak } from '../../srs/stats'
 import { GRADE_LABELS, GRADES, Rating } from '../../srs/scheduler'
 import type { Session } from '../../srs/session'
 
@@ -15,6 +18,15 @@ export function Summary({
   const [minutes] = useState(() =>
     Math.max(1, Math.round((Date.now() - startedAt.getTime()) / 60_000)),
   )
+  // Seri ve yarının yükü: kullanıcıya yarın neden geri gelmesi gerektiğini gösterir
+  const outlook = useLiveQuery(async () => {
+    const now = new Date()
+    const [dates, cards] = await Promise.all([
+      db.reviews.orderBy('review').keys() as Promise<Date[]>,
+      db.cards.toArray(),
+    ])
+    return { streak: streak(dates, now), tomorrow: forecast(cards, now, 2)[1].count }
+  }, [])
 
   if (answered.length === 0) {
     return (
@@ -56,6 +68,20 @@ export function Summary({
           <Stat label="Yeni" value={newWords} />
           <Stat label="Süre" value={`${minutes} dk`} />
         </dl>
+        {outlook && (
+          <div className="animate-page-in mt-5 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
+            {outlook.streak > 0 && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500/15 px-3 py-1 text-sm font-semibold text-orange-700 dark:text-orange-300">
+                <FlameIcon className="animate-flame size-4" /> {outlook.streak} günlük seri
+              </span>
+            )}
+            <span className="rounded-full bg-zinc-900/5 px-3 py-1 text-sm text-zinc-600 dark:bg-white/5 dark:text-zinc-300">
+              {outlook.tomorrow > 0
+                ? `Yarın ${outlook.tomorrow} tekrar seni bekliyor`
+                : 'Yarın yeni kelimelerle devam'}
+            </span>
+          </div>
+        )}
         <ul className="mt-5 flex flex-wrap justify-center gap-2 text-sm">
           {GRADES.map((g) => (
             <li key={g} className="chip">
